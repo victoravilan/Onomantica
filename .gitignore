@@ -1,22 +1,12 @@
-# Dependencias
 node_modules/
-
-# Build
 dist/
 build/
-
-# IDE y sistema
 .vscode/
 .DS_Store
 Thumbs.db
-
-# Environments
 .env
 .env.*
-
-# Plataformas
 .vercel/
 .netlify/
-capacitor.config.json
 android/
 ios/
