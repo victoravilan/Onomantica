@@ -1,13 +1,7 @@
-import { Sparkles, PenLine, LandPlot, Stars } from "lucide-react";
+import React from "react";
+import Chip from "./Chip";
 
 export type Tone = "épica" | "poética" | "mitológica" | "fantástica";
-
-const OPTIONS: Array<{ key: Tone; icon: any; label: string }> = [
-  { key: "épica",       icon: Sparkles, label: "Épica" },
-  { key: "poética",     icon: PenLine,  label: "Poética" },
-  { key: "mitológica",  icon: LandPlot, label: "Mitológica" },
-  { key: "fantástica",  icon: Stars,    label: "Fantástica" },
-];
 
 type Props = {
   value: Tone;
@@ -15,23 +9,17 @@ type Props = {
   onRegenerate?: () => void;
 };
 
-export default function ToneSelector({ value, onChange, onRegenerate }: Props) {
+const tones: Tone[] = ["épica","poética","mitológica","fantástica"];
+
+export default function ToneSelector({ value, onChange, onRegenerate }: Props){
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      {OPTIONS.map(({ key, icon: Icon, label }) => (
-        <button
-          key={key}
-          onClick={() => onChange(key)}
-          className={`tone-pill ${value === key ? "tone-pill-active" : ""}`}
-        >
-          <Icon size={16} className="text-[color:var(--gold)]" />
-          <span>{label}</span>
-        </button>
+    <div className="flex flex-wrap gap-3 items-center">
+      {tones.map(t=>(
+        <Chip key={t} active={value === t} onClick={()=>onChange(t)}>
+          {t[0].toUpperCase()+t.slice(1)}
+        </Chip>
       ))}
-      <button onClick={onRegenerate} className="tone-pill">
-        <span className="w-2.5 h-2.5 rounded-full bg-[color:var(--gold)] mr-2 animate-pulse" />
-        Regenerar
-      </button>
+      <Chip onClick={onRegenerate}>Regenerar</Chip>
     </div>
   );
 }
