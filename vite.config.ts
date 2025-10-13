@@ -2,17 +2,12 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// Nota: los íconos deben estar en public/img/...
-// public/
-//   manifest.webmanifest (opcional si usas el del plugin)
-//   img/icon-80.png, icon-192.png, icon-512.png, favicon.ico
-
 export default defineConfig({
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      // incluye íconos para cache inicial
+      injectRegister: 'auto',
       includeAssets: [
         'img/favicon.ico',
         'img/icon-80.png',
@@ -37,15 +32,33 @@ export default defineConfig({
         ]
       },
       workbox: {
-        // cachea JSON, imágenes y fuentes para modo offline “decente”
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,json,woff2}'],
+        // No metas JSON grandes en el pre-cache:
+        // (solo js/css/html/media…)
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,woff2}'],
+
+        // Cachea el dataset en RUNTIME (al primer fetch), no en el build:
+        runtimeCaching: [
+          {
+            // Si quieres cachear específicamente el dataset:
+            urlPattern: ({ url }) => url.pathname.startsWith('/data/nombres_completos.json'),
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'dataset-cache',
+              expiration: {
+                maxEntries: 1,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 días
+              }
+            }
+          }
+        ],
+
+        // (opcional) si aún así quisieras permitir archivos grandes:
+        // maximumFileSizeToCacheInBytes: 6 * 1024 * 1024
       }
     })
   ],
   server: {
-    // si más adelante usas vercel dev y quieres proxy de /api:
-    // proxy: {
-    //   '/api': { target: 'http://localhost:3000', changeOrigin: true }
-    // }
+    // Si usas vercel dev para /api, puedes habilitar esto:
+    // proxy: { '/api': { target: 'http://localhost:3000', changeOrigin: true } }
   }
 })
