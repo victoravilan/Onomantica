@@ -16,6 +16,7 @@ import { meaningFromRoots } from './lib/generator'
 import { enrichName } from './lib/enrich'
 import { analyzeCompound } from './lib/compound'
 
+// Motor de relatos y proveedor (con fallback remoto→local)
 import { type Tone } from './lib/stories'
 import {
   LocalStoryProvider,
@@ -37,27 +38,21 @@ export default function App(){
   const [tags, setTags] = useState<string[]>([])
   const [extras, setExtras] = useState<RuleNote[]>([])
 
-  // Antirrepetición por (nombre|tono)
+  // antirrepetición por (nombre|tono)
   const seenRef = useRef<Map<string, Set<string>>>(new Map())
 
-  // —— PROVEEDOR ——
-  // Opción A (segura): arranca en LOCAL.
+  // Proveedor: por defecto Local (puedes cambiar a Remote cuando subas a Vercel)
   const providerRef = useRef<StoryProvider>(
     new LocalStoryProvider()
+    // new RemoteStoryProvider('/api/story') // ← cuando tengas endpoint activo
   )
 
-  // Opción B (si ya tienes endpoint en marcha), cambia aquí:
-  // const providerRef = useRef<StoryProvider>(
-  //   new RemoteStoryProvider('/api/story')               // Vercel
-  //   // new RemoteStoryProvider('/.netlify/functions/story') // Netlify
-  // )
-
   useEffect(()=>{
-    (async ()=>{
-      try{
+    ;(async ()=>{
+      try {
         const data = await loadDataset()
         setRaw(data)
-      }catch(e:any){
+      } catch (e:any) {
         console.error(e)
         setError('No se pudo cargar /data/nombres_completos.json')
       }
@@ -96,14 +91,12 @@ export default function App(){
     const key = `${normalize(nombre)}|${tone}`
     const avoid = getAvoid(key)
     let provider = providerRef.current
-
     try {
       const out = await provider.generate({ nombre, significado, tone, seed, tags, avoid })
       registerSeenKey(key, out.relato)
       setStory({ tipo: out.tipo, relato: out.relato })
     } catch (err) {
       console.warn('Proveedor remoto falló, usando Local:', err)
-      // Fallback automático a Local si el proveedor actual no es Local
       provider = new LocalStoryProvider()
       providerRef.current = provider
       const out = await provider.generate({ nombre, significado, tone, seed, tags, avoid })
@@ -111,6 +104,16 @@ export default function App(){
       setStory({ tipo: out.tipo, relato: out.relato })
     }
   }
+
+  // 🔧 Arreglo clave: si cambias el tono y ya hay resultado en pantalla, regenera con el nuevo tono
+  useEffect(()=>{
+    if (hit) {
+      void makeStory(hit.nombre, hit.significado)
+    } else if (fallback) {
+      void makeStory(q.trim(), fallback.significado)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tone])
 
   function regenerateCurrent() {
     setSeed(Date.now() | 0)
@@ -124,11 +127,11 @@ export default function App(){
   async function submit(){
     const name = q.trim()
     if (!name) return
-
     const key = normalize(name)
     setSeed(Date.now() | 0)
     setExtras([])
 
+    // 0) Compuesto si no hay hit directo
     let known = byName.get(key)
     if (!known) {
       const comp = analyzeCompound(name, byName)
@@ -153,6 +156,7 @@ export default function App(){
       }
     }
 
+    // 1) Búsqueda normal
     known = byName.get(key)
     if (!known && raw) {
       const found = raw.find(r => normalize(r.nombre) === key)
@@ -174,7 +178,6 @@ export default function App(){
 
       setHit(enriched)
       setFallback(null)
-
       await makeStory(enriched.nombre, enriched.significado)
     } else {
       const synth = meaningFromRoots(name)
@@ -190,7 +193,6 @@ export default function App(){
         significado: invEnr.mergedMeaning ?? synth.significado,
         origen: invEnr.mergedOrigin ?? synth.origen
       })
-
       await makeStory(name, invEnr.mergedMeaning ?? synth.significado)
     }
   }
@@ -208,7 +210,8 @@ export default function App(){
 
       <main className="max-w-5xl mx-auto px-4 py-10">
         <div className="flex flex-col items-center gap-6">
-          <SearchBar value={q} onChange={setQ} onSubmit={submit}/>
+          <SearchBar value={q} onChange={setQ} onSubmit={submit} />
+
           {!error && raw && (
             <div className="text-sm text-slate-500">
               Dataset cargado: {raw.length} nombres
@@ -220,7 +223,7 @@ export default function App(){
             <div className="w-full max-w-2xl">
               <ToneSelector
                 value={tone}
-                onChange={(t)=>{ setTone(t); regenerateCurrent() }}
+                onChange={(t)=> setTone(t)}
                 onRegenerate={regenerateCurrent}
               />
             </div>
