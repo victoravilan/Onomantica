@@ -1,37 +1,50 @@
-// src/components/ToneSelector.tsx
-import React from 'react'
-import type { Tone } from '../lib/stories'
+import React from "react";
+import { Flame, Feather, Landmark, Sparkles, RefreshCcw } from "lucide-react";
 
-const TONES: Tone[] = ['épica','poética','mitológica','fantástica']
+export type Tone = "épica" | "poética" | "mitológica" | "fantástica";
 
-export default function ToneSelector({
-  value, onChange, onRegenerate
-}:{
-  value: Tone
-  onChange: (t: Tone) => void
-  onRegenerate: () => void
-}){
+type Props = {
+  value: Tone;
+  onChange: (t: Tone) => void;
+  onRegenerate: () => void;
+};
+
+const tones: { id: Tone; label: string; icon: React.ReactNode; className: string }[] = [
+  { id: "épica",       label: "épica",       icon: <Flame className="size-4" />,     className: "tone-epica" },
+  { id: "poética",     label: "poética",     icon: <Feather className="size-4" />,   className: "tone-poetica" },
+  { id: "mitológica",  label: "mitológica",  icon: <Landmark className="size-4" />,  className: "tone-mitologica" },
+  { id: "fantástica",  label: "fantástica",  icon: <Sparkles className="size-4" />,   className: "tone-fantastica" },
+];
+
+export default function ToneSelector({ value, onChange, onRegenerate }: Props) {
   return (
-    <div className="flex items-center gap-2 flex-wrap">
-      <div className="text-sm text-slate-400">Tono:</div>
-      <div className="flex gap-2">
-        {TONES.map(t => (
+    <div className="flex flex-wrap items-center gap-2">
+      {tones.map((t) => {
+        const active = value === t.id;
+        return (
           <button
-            key={t}
-            onClick={()=>onChange(t)}
-            className={`px-3 py-1.5 rounded-xl text-sm border
-              ${value===t
-                ? 'bg-indigo-600 text-white border-indigo-500'
-                : 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700'}`}>
-            {t}
+            key={t.id}
+            type="button"
+            className={`tone ${t.className} ${active ? "active" : ""}`}
+            onClick={() => onChange(t.id)}
+            aria-pressed={active}
+            title={`Tono ${t.label}`}
+          >
+            {t.icon}
+            <span className="capitalize">{t.label}</span>
           </button>
-        ))}
-      </div>
+        );
+      })}
+
       <button
+        type="button"
+        className="tone hover:bg-violet-600/15 border-violet-400/30"
         onClick={onRegenerate}
-        className="ml-2 px-3 py-1.5 rounded-xl text-sm bg-slate-700 hover:bg-slate-600 text-white border border-slate-600">
-        Regenerar
+        title="Regenerar historia"
+      >
+        <RefreshCcw className="size-4" />
+        <span>Regenerar</span>
       </button>
     </div>
-  )
+  );
 }
