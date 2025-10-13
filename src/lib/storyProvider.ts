@@ -1,63 +1,45 @@
 // src/lib/storyProvider.ts
-// Abstracción de proveedor de historias: Local (reglas) y Remote (stub /api/story).
-// Así puedes activar un backend/LLM sin tocar la UI. También define un "comando" interno.
+import { buildStory, type Tone, type StoryContext } from './storyEngine'
 
-import { generateStory, type Tone } from './stories'
-
-export type StoryRequest = {
+export type GenerateInput = {
   nombre: string
   significado: string
   tone: Tone
-  seed: number
-  tags: string[]
-  avoid?: string[]      // lista de relatos ya vistos para evitar repetición
+  seed?: number
+  tags?: string[]
+  avoid?: string[]
 }
 
-export type StoryResponse = { tipo: string; relato: string }
+export type GenerateOutput = {
+  tipo: string
+  relato: string
+  notas?: string[]
+}
 
 export interface StoryProvider {
-  generate(req: StoryRequest): Promise<StoryResponse>
+  generate(input: GenerateInput): Promise<GenerateOutput>
 }
 
-// —————————————————————————————————————————————
-// Proveedor LOCAL (reglas de stories.ts)
-// —————————————————————————————————————————————
+// Proveedor local (offline)
 export class LocalStoryProvider implements StoryProvider {
-  async generate(req: StoryRequest): Promise<StoryResponse> {
-    const out = generateStory(req.nombre, req.significado, {
-      tone: req.tone,
-      seed: req.seed,
-      tags: req.tags,
-      avoid: req.avoid
+  async generate(input: GenerateInput): Promise<GenerateOutput> {
+    const out = buildStory(input.tone, {
+      nombre: input.nombre,
+      significado: input.significado,
+      tags: input.tags,
+      seed: input.seed,
+      avoid: input.avoid
     })
-    return out
+    return { tipo: out.tipo, relato: out.relato, notas: out.notas }
   }
 }
 
-// —————————————————————————————————————————————
-// Proveedor REMOTO (stub): POST /api/story
-// Espera un JSON con la misma estructura de StoryRequest.
-// Devuelve { tipo, relato }. Implementa tu serverless a gusto.
-// —————————————————————————————————————————————
-export class RemoteStoryProvider implements StoryProvider {
-  constructor(private endpoint = '/api/story') {}
-  async generate(req: StoryRequest): Promise<StoryResponse> {
-    const res = await fetch(this.endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(req)
-    })
-    if (!res.ok) throw new Error(`Remote story error HTTP ${res.status}`)
-    const data = await res.json()
-    // saneo básico
-    return { tipo: String(data.tipo ?? req.tone), relato: String(data.relato ?? '') }
-  }
-}
-
-/**
- * “Comando interno” sugerido (por si expones en UI una mini consola):
- * 
- *   /onomantica:story nombre="Marisol" tone="poética" tags="celeste,naturaleza,elemento:agua"
- * 
- * Lo parseas en la app y llamas a StoryProvider.generate con esos params.
- */
+// Si más tarde quieres remoto:
+// export class RemoteStoryProvider implements StoryProvider {
+//   constructor(private url: string){}
+//   async generate(input: GenerateInput): Promise<GenerateOutput> {
+//     const res = await fetch(this.url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(input) })
+//     if (!res.ok) throw new Error('Remote error')
+//     return await res.json()
+//   }
+// }
