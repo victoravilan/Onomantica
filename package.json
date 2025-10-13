@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vite build --ssr",
-    "preview": "vite preview",
+    "build": "vite build",
+    "preview": "vite preview --port 4173",
     "analyze": "vite build --mode analyze",
     "android": "vite build && npx cap sync android && npx cap open android"
   },
