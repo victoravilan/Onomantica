@@ -1,10 +1,12 @@
-import React from 'react'
+type Props = { tipo: string; texto: string };
 
-export default function StoryCard({ tipo, texto }:{ tipo: string, texto: string }) {
+export default function StoryCard({ tipo, texto }: Props) {
   return (
-    <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-700/40 to-fuchsia-600/30 ring-1 ring-indigo-600/40 text-slate-50">
-      <div className="uppercase tracking-widest text-xs text-indigo-200 mb-2">Historia {tipo}</div>
-      <p className="leading-relaxed">{texto}</p>
-    </div>
-  )
+    <section className="card p-6 shine card-gold">
+      <div className="uppercase tracking-widest text-[12px] text-[color:var(--gold-dim)] mb-2">
+        {tipo}
+      </div>
+      <p className="story">{texto}</p>
+    </section>
+  );
 }

@@ -1,12 +1,17 @@
-import React from 'react'
+type Props = { titulo: string; lines: string[] };
 
-export default function MeaningCard({ titulo, lines }:{ titulo: string, lines: string[] }) {
+export default function MeaningCard({ titulo, lines }: Props) {
   return (
-    <div className="p-5 rounded-2xl bg-slate-800/50 ring-1 ring-slate-700 text-slate-200">
-      <h3 className="text-slate-100 font-semibold mb-2">{titulo}</h3>
-      <ul className="list-disc ml-5 space-y-1">
-        {lines.map((l,i)=><li key={i}>{l}</li>)}
+    <section className="card p-6 shine">
+      <h3 className="h-section mb-3">{titulo}</h3>
+      <ul className="space-y-2 text-slate-200/90">
+        {lines.map((l, i) => (
+          <li key={i} className="flex gap-2">
+            <span className="mt-[6px] w-1.5 h-1.5 rounded-full bg-[color:var(--gold)]/80" />
+            <span>{l}</span>
+          </li>
+        ))}
       </ul>
-    </div>
-  )
+    </section>
+  );
 }
