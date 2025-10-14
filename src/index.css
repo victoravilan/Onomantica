@@ -2,73 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
-/* --------- Base --------- */
-:root { color-scheme: dark; }
+/* Modo de color y altura total */
+:root { color-scheme: light dark; }
 html, body, #root { height: 100%; }
+
+/* Fondo y tipografía base */
 body {
-  @apply bg-night text-[15px] text-mist antialiased bg-radial-iris;
+  @apply bg-slate-950 text-slate-100 antialiased;
 }
 
-/* --------- Componentes (tokens) --------- */
-@layer components {
-  /* Tarjeta violeta con brillo */
-  .card {
-    @apply bg-iris/55 backdrop-blur-md rounded-2xl shadow-inner-card ring-1 ring-white/5;
-  }
-  .card--outlined {
-    @apply ring-white/10 shadow-glow;
-  }
-
-  /* Botón dorado primario */
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-pill px-5 py-2.5 font-semibold text-slate-900 shadow-glow;
-    background-image: theme('backgroundImage.gold-grad');
-  }
-  .btn:hover { filter: brightness(1.03); }
-
-  /* Chip (tono/acción) */
-  .chip {
-    @apply inline-flex items-center gap-2 rounded-pill px-4 py-2 border border-gold/20 text-gold/90 bg-iris/40 hover:bg-iris/60 transition;
-  }
-  .chip--active {
-    @apply border-gold text-slate-900;
-    background-image: theme('backgroundImage.gold-grad');
-  }
-
-  /* Input + botón integrado */
-  .search {
-    @apply flex items-center gap-2 w-full;
-  }
-  .search__input {
-    @apply flex-1 rounded-pill bg-royal/70 border border-white/10 px-5 py-3 text-mist placeholder:mst outline-none focus:border-gold focus:ring-2 focus:ring-gold/30;
-  }
-  .search__btn {
-    @apply btn px-6;
-  }
-
-  /* Titulares */
-  .brand {
-    @apply text-gold tracking-wide font-serif text-2xl md:text-3xl;
-    text-shadow: 0 1px 0 rgba(255,255,255,.15);
-  }
-  .section-title {
-    @apply text-gold/90 font-semibold tracking-wide uppercase text-sm;
-  }
+/* Fondo decorativo sutil (puedes quitarlo si prefieres liso) */
+.bg-onomantica {
+  background:
+    radial-gradient(70rem 70rem at 10% -10%, rgba(132, 76, 247, .06), transparent 60%),
+    radial-gradient(60rem 60rem at 120% 20%, rgba(14, 165, 233, .05), transparent 60%),
+    radial-gradient(90rem 80rem at 50% 130%, rgba(234, 179, 8, .04), transparent 60%),
+    #0b1220;
 }
-@layer utilities {
-  .rounded-pill { border-radius: 9999px; }
-  .shadow-glow { box-shadow: 0 0 8px rgba(255, 215, 0, 0.4); }
-  .shadow-inner-card { box-shadow: inset 0 1px 3px rgba(0,0,0,.2), inset 0 -1px 2px rgba(255,255,255,.1); }
 
-  .bg-radial-iris {
-    background-image: radial-gradient(circle at top left, #7b2ff7, #f107a3);
-  }
-  .bg-radial-mist {
-    background-image: radial-gradient(circle at top left, #3a3d40, #18191c);
-  }
-
-  /* Gradiente dorado */
-  .bg-gradient-gold {
-    background-image: linear-gradient(90deg, #fcd34d, #fbbf24, #f59e0b);
-  }
+/* Tarjetas */
+.card {
+  @apply rounded-2xl border border-slate-800/60 bg-slate-900/50 backdrop-blur-sm shadow-[0_10px_30px_-10px_rgba(0,0,0,0.4)];
 }
+.card-hover {
+  @apply transition-transform duration-300 hover:-translate-y-[1px] hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.5)];
+}
+
+/* Botón primario (morado-dorado) */
+.btn-primary {
+  @apply inline-flex items-center gap-2 rounded-xl px-4 py-2 font-medium
+         text-slate-900
+         bg-gradient-to-r from-amber-300 via-amber-200 to-amber-300
+         shadow-[0_8px_18px_-6px_rgba(250,204,21,0.4)]
+         transition-all;
+}
+.btn-primary:hover {
+  @apply brightness-105 shadow-[0_10px_22px_-8px_rgba(250,204,21,0.5)];
+}
+
+/* Botón secundario */
+.btn-secondary {
+  @apply inline-flex items-center gap-2 rounded-xl px-4 py-2 font-medium
+         text-slate-100 bg-slate-800 border border-slate-700
+         hover:bg-slate-750 transition-colors;
+}
+
+/* Botón de tono (épica/poética/…) */
+.tone-btn {
+  @apply inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm
+         border border-slate-700/60 bg-slate-800/60 text-slate-200
+         transition-colors;
+}
+.tone-btn[data-active="true"] {
+  @apply bg-gradient-to-r from-violet-500/30 to-fuchsia-500/30 border-violet-400/50 text-amber-200;
+}
+
+/* Campo de búsqueda */
+.input {
+  @apply w-full rounded-2xl border border-slate-800 bg-slate-900/60
+         px-4 py-3 text-slate-100 shadow-inner shadow-black/20
+         focus:outline-none focus:ring-2 focus:ring-violet-400/40 focus:border-violet-400/50
+         transition-colors;
+}
+/* <<< AQUÍ ESTABA EL PROBLEMA >>> */
+/* En CSS se usa ::placeholder + @apply (no @apply placeholder:*) */
+.input::placeholder {
+  @apply text-slate-400;
+}
+
+/* Etiquetas de “Notas” */
+.badge-note {
+  @apply inline-flex items-center gap-2 rounded-full border
+         border-amber-400/30 bg-amber-400/10 text-amber-200
+         px-3 py-1 text-xs;
+}
+
+/* Cabecera */
+.header {
+  @apply sticky top-0 z-10 border-b border-slate-800/60 bg-slate-950/70 backdrop-blur;
+}
+
+/* Contenedores */
+.container-narrow { @apply max-w-5xl mx-auto px-4; }
+.container-wide   { @apply max-w-6xl mx-auto px-4; }
