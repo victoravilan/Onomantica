@@ -14,6 +14,45 @@ import csv, json, random, argparse
 from typing import List, Dict
 
 TIPOS = ["histórica","bíblica","mitológica","poética","fantástica"]
+RASGOS1 = ["valentía","sabiduría","protección","alegría","resiliencia","claridad","creatividad","fortaleza interior","templanza","curiosidad"]
+RASGOS2 = ["empático","leal","visionario","protector","inspirador","honesto","sereno","disciplinado","compasivo","observador"]
+IMPULSOS = ["liderazgo consciente","búsqueda de verdad","cuidado de los demás","crecimiento personal","sueños grandes","decisiones justas","aprendizaje continuo","servicio generoso"]
+REFLEJOS = ["luz espiritual","equilibrio emocional","disciplina práctica","imaginación fértil","bondad auténtica","esperanza activa","pensamiento crítico","gracia bajo presión"]
+
+RELATOS_PLANTILLAS = {
+    "bíblica": (
+        "{nombre} aparece en tradiciones bíblicas, donde la fe atraviesa pruebas y renueva el corazón. "
+        "Su historia recuerda que la dignidad florece cuando se sirve con humildad y verdad. "
+        "Quien lleva {nombre} aprende a escuchar el silencio, a decidir con conciencia y a agradecer cada avance. "
+        "Ante la angustia, {nombre} confía; ante el éxito, comparte. Así el nombre se vuelve puente entre lo humano y lo sagrado."
+    ),
+    "mitológica": (
+        "Los relatos antiguos susurran que {nombre} cruzó valles y montañas guiado por un juramento de honor. "
+        "No vencía por fuerza, sino por enfoque y templanza. Su huella, dicen, dejaba centellas sobre la piedra húmeda. "
+        "Quien porta {nombre} conserva ese pacto con lo extraordinario: entrenar sin alarde, cuidarse del orgullo, "
+        "y honrar el destino con disciplina. Cuando el miedo aparece, {nombre} lo convierte en maestro paciente."
+    ),
+    "histórica": (
+        "En crónicas y memorias, {nombre} aparece ligado a decisiones firmes y horizontes abiertos. "
+        "Aprendió a rectificar sin perder la dignidad y a sostener la palabra dada. "
+        "El nombre {nombre} inspira a tejer puentes entre generaciones y culturas, a ordenar el caos cotidiano "
+        "y a encender esperanza concreta donde otros renuncian. Liderazgo, sí, pero como servicio: "
+        "mirar a los ojos, escuchar, y avanzar con respeto incluso en la discrepancia."
+    ),
+    "poética": (
+        "Dicen que cuando alguien susurra {nombre}, una brisa limpia aquieta las dudas. "
+        "El nombre guarda rumor de agua clara, paciencia y belleza sencilla. "
+        "Quien lo lleva aprende a elegir palabras que curan y silencios que sostienen. "
+        "Para brillar no necesita ruido: basta un gesto exacto, una mirada honesta, "
+        "y una decisión valiente en el momento justo, como una lámpara pequeña en cuarto oscuro."
+    ),
+    "fantástica": (
+        "En un bosque sin coordenadas, {nombre} halló una lámpara hecha de auroras. "
+        "Cada vez que alguien se perdía, el cristal encendía un sendero de luciérnagas hasta la salida. "
+        "Desde entonces, {nombre} simboliza coraje amable que guía sin imponer, ingenio que vuelve sombras en señales, "
+        "y ternura que recuerda el camino a casa incluso cuando el mundo gira demasiado rápido."
+    )
+}
 
 def _pal(lista): return random.choice(lista)
 
@@ -28,6 +67,10 @@ def generar_significado(nombre: str, origen: str) -> str:
         "carácter", _pal(rasgos2)+",",
         "que impulsa", _pal(impulsos),
         "y refleja", _pal(reflejos)+",",
+        "asociado a", _pal(RASGOS1)+",",
+        "carácter", _pal(RASGOS2)+",",
+        "que impulsa", _pal(IMPULSOS),
+        "y refleja", _pal(REFLEJOS)+",",
         "con vocación de encuentro y sentido en momentos decisivos de la vida."
     ]
     return " ".join(base)
@@ -93,6 +136,8 @@ def generar_relato(nombre: str, tipo: str) -> str:
         "poética": _relato_poetico,
         "fantástica": _relato_fantastico
     }.get(tipo, _relato_poetico)(nombre)
+    plantilla = RELATOS_PLANTILLAS.get(tipo, RELATOS_PLANTILLAS["poética"])
+    return " ".join(plantilla.format(nombre=nombre).split())
 
 def procesar_fila(row: Dict[str,str], preferidos: List[str]) -> Dict:
     nombre = (row.get("Nombre") or row.get("nombre") or "").strip()
@@ -109,6 +154,7 @@ def procesar_fila(row: Dict[str,str], preferidos: List[str]) -> Dict:
 def main():
     ap = argparse.ArgumentParser(description="Genera significados y relatos para nombres (JSON).")
     ap.add_argument("--in", dest="in_csv", required=True, help="CSV entrada (Nombre,Género,Origen).")
+    ap.add_argument("--infile", dest="in_csv", required=True, help="CSV entrada (Nombre,Género,Origen).")
     ap.add_argument("--out", dest="out_json", required=True, help="JSON de salida.")
     ap.add_argument("--max", dest="max_rows", type=int, default=0, help="Filas a procesar (0 = todas).")
     ap.add_argument("--skip", dest="skip_rows", type=int, default=0, help="Filas a saltar desde el inicio.")
