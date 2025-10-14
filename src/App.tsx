@@ -40,13 +40,7 @@ export default function App(){
   // Antirrepetición por (nombre|tono)
   const seenRef = useRef<Map<string, Set<string>>>(new Map())
 
-// const providerRef = useRef<StoryProvider>(new LocalStoryProvider())
-const providerRef = useRef<StoryProvider>(
-  new RemoteStoryProvider('/.netlify/functions/story')
-)
 
-
-  
   // —— PROVEEDOR ——
   // Opción A (segura): arranca en LOCAL.
   const providerRef = useRef<StoryProvider>(
