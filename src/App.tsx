@@ -14,12 +14,12 @@ const NameCard = ({ item }: { item: NameData | null }) => {
     const [p1, p2, p3, p4, p5] = paragraphs;
 
     const Section = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
-        <div className="mt-6">
-            <h4 className="flex items-center gap-2 font-serif text-lg text-amber-300/80 mb-2">
-                <Icon className="h-4 w-4" />
+        <div className="mt-8">
+            <h4 className="flex items-center gap-3 font-serif text-xl text-amber-300/80 mb-3">
+                <Icon className="h-5 w-5 flex-shrink-0" />
                 {title}
             </h4>
-            <p className="text-slate-400 text-sm sm:text-base leading-relaxed">{children}</p>
+            <p className="text-slate-300 text-base leading-relaxed pl-8">{children}</p>
         </div>
     );
 
@@ -61,8 +61,7 @@ function App() {
     const [raw, setRaw] = useState<NameData[] | null>(null);
     const [q, setQ] = useState('');
     const [hit, setHit] = useState<NameData | null>(null);
-    const [fallback, setFallback] = useState<{ origen: string, significado: string, rasgos: string[] } | null>(null);
-    const [story, setStory] = useState<{ tipo: string, relato: string } | null>(null);
+    const [fallbackResult, setFallbackResult] = useState<{ name: string, data: any, story: any } | null>(null);
     const [loading, setLoading] = useState(true);
     const [searched, setSearched] = useState(false);
 
@@ -85,8 +84,7 @@ function App() {
         setSearched(true);
         if (!name) {
             setHit(null);
-            setFallback(null);
-            setStory(null);
+            setFallbackResult(null);
             return;
         }
 
@@ -95,16 +93,13 @@ function App() {
 
         if (known) {
             setHit(known);
-            setFallback(null);
-            // CORRECCIÓN: Ya no generamos una historia aparte.
-            // El contenido completo está en `known.significado`.
-            // El estado 'story' ya no es necesario para los nombres conocidos.
+            setFallbackResult(null);
         } else {
+            // Modo Onomántica: generar al momento
             const synth = meaningFromRoots(name);
             setHit(null);
-            setFallback(synth);
-            const s = storyFromConstructed(name);
-            setStory(s);
+            const story = storyFromConstructed(name, synth.significado);
+            setFallbackResult({ name, data: synth, story });
         }
     };
 
@@ -136,15 +131,13 @@ function App() {
                 </div>
             )}
 
-            {!loading && searched && !hit && !fallback && q && (
+            {!loading && searched && !hit && !fallbackResult && q && (
                 <p className="text-slate-500">No se encontraron resultados para "{q}".</p>
             )}
 
             <div className="w-full max-w-3xl mx-auto grid gap-6">
-                {/* CORRECCIÓN: Mostramos NameCard solo con 'hit'. */}
                 {hit && <NameCard item={hit} />}
-                {/* La lógica de Fallback sigue igual y funciona correctamente. */}
-                {fallback && story && <FallbackCard name={q} data={fallback} story={story} />}
+                {fallbackResult && <FallbackCard name={fallbackResult.name} data={fallbackResult.data} story={fallbackResult.story} />}
             </div>
         </main>
     );
