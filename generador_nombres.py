@@ -19,6 +19,14 @@ RASGOS2 = ["empático","leal","visionario","protector","inspirador","honesto","s
 IMPULSOS = ["liderazgo consciente","búsqueda de verdad","cuidado de los demás","crecimiento personal","sueños grandes","decisiones justas","aprendizaje continuo","servicio generoso"]
 REFLEJOS = ["luz espiritual","equilibrio emocional","disciplina práctica","imaginación fértil","bondad auténtica","esperanza activa","pensamiento crítico","gracia bajo presión"]
 
+DATOS_ESPECIFICOS = {
+    "alejandro": "Su legado, como el del gran conquistador, evoca la capacidad de unir mundos y expandir horizontes, demostrando que la verdadera grandeza reside en la visión y la audacia.",
+    "cesar": "El nombre resuena con el poder y la autoridad del líder romano, un estratega que transformó la historia. Quien lo lleva hereda un eco de mando y determinación.",
+    "margarita": "Como la flor que lleva su nombre y la isla que inspira leyendas, Margarita evoca una belleza natural y una perla de sabiduría oculta. Su significado se despliega en pétalos de sencillez y tesoros de resiliencia.",
+    "rosa": "Más que una flor, es un símbolo de amor, pasión y misterio esotérico. El nombre Rosa guarda el secreto de una belleza que se defiende con espinas y se entrega en su fragancia.",
+    "berna": "Con la fuerza del oso y la solidez de la ciudad que nombra, Berna es un topónimo hecho persona. Simboliza un refugio de poder y una capital de carácter firme."
+}
+
 RELATOS_PLANTILLAS = {
     "bíblica": (
         "{nombre} aparece en tradiciones bíblicas, donde la fe atraviesa pruebas y renueva el corazón. "
@@ -57,60 +65,14 @@ RELATOS_PLANTILLAS = {
 def _pal(lista): return random.choice(lista)
 
 def generar_significado(nombre: str, origen: str) -> str:
-    rasgos1 = ["valentía","sabiduría","protección","alegría","resiliencia","claridad","creatividad","fortaleza interior","templanza","curiosidad"]
-    rasgos2 = ["empático","leal","visionario","protector","inspirador","honesto","sereno","disciplinado","compasivo","observador"]
-    impulsos = ["liderazgo consciente","búsqueda de verdad","cuidado de los demás","crecimiento personal","sueños grandes","decisiones justas","aprendizaje continuo","servicio generoso"]
-    reflejos = ["luz espiritual","equilibrio emocional","disciplina práctica","imaginación fértil","bondad auténtica","esperanza activa","pensamiento crítico","gracia bajo presión"]
     base = [
-        f"Nombre de origen {origen.lower()}",
-        "asociado a", _pal(rasgos1)+",",
-        "carácter", _pal(rasgos2)+",",
-        "que impulsa", _pal(impulsos),
-        "y refleja", _pal(reflejos)+",",
-        "asociado a", _pal(RASGOS1)+",",
-        "carácter", _pal(RASGOS2)+",",
-        "que impulsa", _pal(IMPULSOS),
-        "y refleja", _pal(REFLEJOS)+",",
-        "con vocación de encuentro y sentido en momentos decisivos de la vida."
+        f"De origen {origen.lower()}, asociado a la {_pal(RASGOS1)}.",
+        f"Refleja un carácter {_pal(RASGOS2)} que impulsa hacia el {_pal(IMPULSOS)}.",
+        f"Su esencia es una vocación de {_pal(REFLEJOS)} en los momentos decisivos de la vida."
     ]
+    # Une las frases con una lógica que evite la repetición y suene más natural.
+    # Por ejemplo, podrías elegir 2 de las 3 frases al azar.
     return " ".join(base)
-
-def _relato_biblico(nombre: str) -> str:
-    s = (f"{nombre} aparece en tradiciones bíblicas, donde la fe atraviesa pruebas y renueva el corazón. "
-         f"Su historia recuerda que la dignidad florece cuando se sirve con humildad y verdad. "
-         f"Quien lleva {nombre} aprende a escuchar el silencio, a decidir con conciencia y a agradecer cada avance. "
-         f"Ante la angustia, {nombre} confía; ante el éxito, comparte. Así el nombre se vuelve puente entre lo humano y lo sagrado.")
-    return " ".join(s.split())
-
-def _relato_mitologico(nombre: str) -> str:
-    s = (f"Los relatos antiguos susurran que {nombre} cruzó valles y montañas guiado por un juramento de honor. "
-         f"No vencía por fuerza, sino por enfoque y templanza. Su huella, dicen, dejaba centellas sobre la piedra húmeda. "
-         f"Quien porta {nombre} conserva ese pacto con lo extraordinario: entrenar sin alarde, cuidarse del orgullo, "
-         f"y honrar el destino con disciplina. Cuando el miedo aparece, {nombre} lo convierte en maestro paciente.")
-    return " ".join(s.split())
-
-def _relato_historico(nombre: str) -> str:
-    s = (f"En crónicas y memorias, {nombre} aparece ligado a decisiones firmes y horizontes abiertos. "
-         f"Aprendió a rectificar sin perder la dignidad y a sostener la palabra dada. "
-         f"El nombre {nombre} inspira a tejer puentes entre generaciones y culturas, a ordenar el caos cotidiano "
-         f"y a encender esperanza concreta donde otros renuncian. Liderazgo, sí, pero como servicio: "
-         f"mirar a los ojos, escuchar, y avanzar con respeto incluso en la discrepancia.")
-    return " ".join(s.split())
-
-def _relato_poetico(nombre: str) -> str:
-    s = (f"Dicen que cuando alguien susurra {nombre}, una brisa limpia aquieta las dudas. "
-         f"El nombre guarda rumor de agua clara, paciencia y belleza sencilla. "
-         f"Quien lo lleva aprende a elegir palabras que curan y silencios que sostienen. "
-         f"Para brillar no necesita ruido: basta un gesto exacto, una mirada honesta, "
-         f"y una decisión valiente en el momento justo, como una lámpara pequeña en cuarto oscuro.")
-    return " ".join(s.split())
-
-def _relato_fantastico(nombre: str) -> str:
-    s = (f"En un bosque sin coordenadas, {nombre} halló una lámpara hecha de auroras. "
-         f"Cada vez que alguien se perdía, el cristal encendía un sendero de luciérnagas hasta la salida. "
-         f"Desde entonces, {nombre} simboliza coraje amable que guía sin imponer, ingenio que vuelve sombras en señales, "
-         f"y ternura que recuerda el camino a casa incluso cuando el mundo gira demasiado rápido.")
-    return " ".join(s.split())
 
 def elegir_tipo(nombre: str, origen: str, preferidos: List[str]) -> str:
     lower = nombre.lower()
@@ -129,15 +91,13 @@ def elegir_tipo(nombre: str, origen: str, preferidos: List[str]) -> str:
     return random.choice(TIPOS)
 
 def generar_relato(nombre: str, tipo: str) -> str:
-    return {
-        "bíblica": _relato_biblico,
-        "mitológica": _relato_mitologico,
-        "histórica": _relato_historico,
-        "poética": _relato_poetico,
-        "fantástica": _relato_fantastico
-    }.get(tipo, _relato_poetico)(nombre)
     plantilla = RELATOS_PLANTILLAS.get(tipo, RELATOS_PLANTILLAS["poética"])
-    return " ".join(plantilla.format(nombre=nombre).split())
+    relato_base = " ".join(plantilla.format(nombre=nombre).split())
+    
+    detalle_especifico = DATOS_ESPECIFICOS.get(nombre.lower())
+    if detalle_especifico:
+        return f"{detalle_especifico} {relato_base}"
+    return relato_base
 
 def procesar_fila(row: Dict[str,str], preferidos: List[str]) -> Dict:
     nombre = (row.get("Nombre") or row.get("nombre") or "").strip()
@@ -153,8 +113,7 @@ def procesar_fila(row: Dict[str,str], preferidos: List[str]) -> Dict:
 
 def main():
     ap = argparse.ArgumentParser(description="Genera significados y relatos para nombres (JSON).")
-    ap.add_argument("--in", dest="in_csv", required=True, help="CSV entrada (Nombre,Género,Origen).")
-    ap.add_argument("--infile", dest="in_csv", required=True, help="CSV entrada (Nombre,Género,Origen).")
+    ap.add_argument("--infile", dest="in_csv", required=True, help="CSV de entrada (Nombre,Género,Origen).")
     ap.add_argument("--out", dest="out_json", required=True, help="JSON de salida.")
     ap.add_argument("--max", dest="max_rows", type=int, default=0, help="Filas a procesar (0 = todas).")
     ap.add_argument("--skip", dest="skip_rows", type=int, default=0, help="Filas a saltar desde el inicio.")

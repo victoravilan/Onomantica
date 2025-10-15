@@ -8,13 +8,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
-      includeAssets: [
-        'img/favicon.ico',
-        'img/icon-80.png',
-        'img/icon-192.png',
-        'img/icon-512.png',
-        'img/logo-onomantica.png'
-      ],
+      includeAssets: ['img/**/*'], // Incluye todos los archivos de la carpeta img
       manifest: {
         name: 'Onomántica',
         short_name: 'Onomántica',
