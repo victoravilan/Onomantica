@@ -12,11 +12,8 @@ const NameCard = ({ item }: { item: NameData | null }) => {
     <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700/50 transition-all hover:border-slate-600 hover:bg-slate-800">
       <h3 className="font-serif text-2xl text-amber-300">{item.nombre}</h3>
       <p className="text-sm text-slate-400 mb-4">{item.origen} / {item.genero}</p>
-      <p className="mb-4 text-slate-300">{item.significado}</p>
-      <div className="border-t border-slate-700 pt-4">
-        <p className="text-sm font-semibold text-amber-400/80 mb-2 capitalize">{item.historia.tipo.replace(/a$/, 'a')}</p>
-        <p className="text-slate-400 text-sm whitespace-pre-wrap">{item.historia.relato}</p>
-      </div>
+      {/* Añadimos 'whitespace-pre-wrap' para que respete los saltos de línea del nuevo contenido */}
+      <p className="mb-4 text-slate-300 whitespace-pre-wrap">{item.significado}</p>
     </div>
   );
 };
