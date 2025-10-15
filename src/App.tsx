@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, LoaderCircle, WandSparkles } from 'lucide-react';
+import { Search, LoaderCircle, WandSparkles, BookText, Users, Feather, Sword, Gem } from 'lucide-react';
 import type { NameData } from './types';
 import { loadDataset } from './lib/store';
 import { normalize } from './lib/diacritics';
@@ -7,15 +7,36 @@ import { storyFromKnown, storyFromConstructed, meaningFromRoots } from './lib/ge
 
 // --- Componentes de Tarjetas ---
 const NameCard = ({ item }: { item: NameData | null }) => {
-  if (!item) return null;
-  return (
-    <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700/50 transition-all hover:border-slate-600 hover:bg-slate-800">
-      <h3 className="font-serif text-2xl text-amber-300">{item.nombre}</h3>
-      <p className="text-sm text-slate-400 mb-4">{item.origen} / {item.genero}</p>
-      {/* Añadimos 'whitespace-pre-wrap' para que respete los saltos de línea del nuevo contenido */}
-      <p className="mb-4 text-slate-300 whitespace-pre-wrap">{item.significado}</p>
-    </div>
-  );
+    if (!item) return null;
+
+    // Divide el significado en párrafos basados en el doble salto de línea
+    const paragraphs = item.significado.split('\n\n');
+    const [p1, p2, p3, p4, p5] = paragraphs;
+
+    const Section = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
+        <div className="mt-6">
+            <h4 className="flex items-center gap-2 font-serif text-lg text-amber-300/80 mb-2">
+                <Icon className="h-4 w-4" />
+                {title}
+            </h4>
+            <p className="text-slate-400 text-sm sm:text-base leading-relaxed">{children}</p>
+        </div>
+    );
+
+    return (
+        <div className="bg-slate-800/50 rounded-lg p-6 sm:p-8 border border-slate-700/50 transition-all hover:border-slate-600 hover:bg-slate-800">
+            <h3 className="font-serif text-3xl sm:text-4xl text-amber-300">{item.nombre}</h3>
+            <p className="text-sm text-slate-400 mb-4">{item.origen} / {item.genero}</p>
+
+            <div className="border-t border-slate-700/50">
+                {p1 && <Section title="Origen y Significado" icon={BookText}>{p1}</Section>}
+                {p2 && <Section title="Legado y Personajes" icon={Users}>{p2}</Section>}
+                {p3 && <Section title="Relato Poético" icon={Feather}>{p3}</Section>}
+                {p4 && <Section title="Narrativa Épica" icon={Sword}>{p4}</Section>}
+                {p5 && <Section title="Numerología" icon={Gem}>{p5}</Section>}
+            </div>
+        </div>
+    );
 };
 
 const FallbackCard = ({ name, data, story }: { name: string, data: { origen: string, significado: string }, story: { tipo: string, relato: string } }) => (
