@@ -96,7 +96,9 @@ function App() {
         if (known) {
             setHit(known);
             setFallback(null);
-            setStory({ tipo: known.historia.tipo, relato: storyFromKnown(known) });
+            // CORRECCIÓN: Ya no generamos una historia aparte.
+            // El contenido completo está en `known.significado`.
+            // El estado 'story' ya no es necesario para los nombres conocidos.
         } else {
             const synth = meaningFromRoots(name);
             setHit(null);
@@ -139,7 +141,9 @@ function App() {
             )}
 
             <div className="w-full max-w-3xl mx-auto grid gap-6">
-                {hit && story && <NameCard item={hit} />}
+                {/* CORRECCIÓN: Mostramos NameCard solo con 'hit'. */}
+                {hit && <NameCard item={hit} />}
+                {/* La lógica de Fallback sigue igual y funciona correctamente. */}
                 {fallback && story && <FallbackCard name={q} data={fallback} story={story} />}
             </div>
         </main>
