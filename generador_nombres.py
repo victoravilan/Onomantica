@@ -19,12 +19,33 @@ RASGOS2 = ["empático","leal","visionario","protector","inspirador","honesto","s
 IMPULSOS = ["liderazgo consciente","búsqueda de verdad","cuidado de los demás","crecimiento personal","sueños grandes","decisiones justas","aprendizaje continuo","servicio generoso"]
 REFLEJOS = ["luz espiritual","equilibrio emocional","disciplina práctica","imaginación fértil","bondad auténtica","esperanza activa","pensamiento crítico","gracia bajo presión"]
 
+# Base de conocimiento para nombres específicos, con etimología y contexto.
 DATOS_ESPECIFICOS = {
-    "alejandro": "Su legado, como el del gran conquistador, evoca la capacidad de unir mundos y expandir horizontes, demostrando que la verdadera grandeza reside en la visión y la audacia.",
-    "cesar": "El nombre resuena con el poder y la autoridad del líder romano, un estratega que transformó la historia. Quien lo lleva hereda un eco de mando y determinación.",
-    "margarita": "Como la flor que lleva su nombre y la isla que inspira leyendas, Margarita evoca una belleza natural y una perla de sabiduría oculta. Su significado se despliega en pétalos de sencillez y tesoros de resiliencia.",
-    "rosa": "Más que una flor, es un símbolo de amor, pasión y misterio esotérico. El nombre Rosa guarda el secreto de una belleza que se defiende con espinas y se entrega en su fragancia.",
-    "berna": "Con la fuerza del oso y la solidez de la ciudad que nombra, Berna es un topónimo hecho persona. Simboliza un refugio de poder y una capital de carácter firme."
+    "alejandro": {
+        "etimologia": "Del griego 'Alexandros', significa 'el que protege al hombre'.",
+        "relato": "Su legado, como el del gran conquistador, evoca la capacidad de unir mundos y expandir horizontes. Quien lleva este nombre aprende que la verdadera fuerza no está en la espada, sino en la visión para proteger y guiar a su gente.",
+        "tags": ["historia", "realeza", "liderazgo", "griego"]
+    },
+    "cesar": {
+        "etimologia": "Del latín 'Caesar', posiblemente de 'caesaries' (cabellera) o 'caedere' (cortar).",
+        "relato": "El nombre resuena con el poder y la autoridad del líder romano que transformó la historia. Quien lo lleva hereda un eco de mando, estrategia y la audacia de cruzar cualquier Rubicón personal.",
+        "tags": ["historia", "liderazgo", "romano", "poder"]
+    },
+    "margarita": {
+        "etimologia": "Del griego 'margarites', que significa 'perla'.",
+        "relato": "Como la perla que le da nombre y la flor que inspira leyendas, Margarita evoca una belleza que se forma en la adversidad. Su significado se despliega en pétalos de sencillez y en el tesoro de una resiliencia luminosa.",
+        "tags": ["naturaleza", "joya", "flor", "griego"]
+    },
+    "rosa": {
+        "etimologia": "Del latín 'rosa', nombre de la flor.",
+        "relato": "Más que una flor, es un símbolo universal de amor, pasión y misterio. El nombre Rosa guarda el secreto de una belleza que se defiende con espinas pero se entrega en su fragancia, un equilibrio entre delicadeza y fortaleza.",
+        "tags": ["naturaleza", "flor", "simbolismo", "amor"]
+    },
+    "berna": {
+        "etimologia": "Topónimo de la capital de Suiza, del germánico 'bero' (oso).",
+        "relato": "Con la fuerza del oso y la solidez de la ciudad que nombra, Berna es un topónimo hecho persona. Simboliza un refugio de poder, una capital de carácter firme y un corazón que protege su territorio con lealtad.",
+        "tags": ["toponimo", "animal", "fuerza", "germanico"]
+    }
 }
 
 RELATOS_PLANTILLAS = {
@@ -65,14 +86,21 @@ RELATOS_PLANTILLAS = {
 def _pal(lista): return random.choice(lista)
 
 def generar_significado(nombre: str, origen: str) -> str:
-    base = [
-        f"De origen {origen.lower()}, asociado a la {_pal(RASGOS1)}.",
-        f"Refleja un carácter {_pal(RASGOS2)} que impulsa hacia el {_pal(IMPULSOS)}.",
-        f"Su esencia es una vocación de {_pal(REFLEJOS)} en los momentos decisivos de la vida."
+    # Si hay un significado etimológico específico, lo usamos como base.
+    info_especifica = DATOS_ESPECIFICOS.get(nombre.lower())
+    if info_especifica and "etimologia" in info_especifica:
+        base = info_especifica["etimologia"]
+        frase_extra = f"Se asocia a un carácter {_pal(RASGOS2)} y a una vocación de {_pal(REFLEJOS)}."
+        return f"{base} {frase_extra}"
+
+    # Si no, creamos uno más variado y menos repetitivo.
+    plantillas = [
+        f"De origen {origen.lower()}, se asocia a la {_pal(RASGOS1)} y a un carácter {_pal(RASGOS2)}.",
+        f"Refleja un carácter {_pal(RASGOS2)} que impulsa hacia el {_pal(IMPULSOS)}, con una esencia de {_pal(REFLEJOS)}.",
+        f"Con raíces en la cultura {origen.lower()}, simboliza la {_pal(RASGOS1)} y una vocación de {_pal(REFLEJOS)}."
     ]
-    # Une las frases con una lógica que evite la repetición y suene más natural.
-    # Por ejemplo, podrías elegir 2 de las 3 frases al azar.
-    return " ".join(base)
+    significado_base = random.choice(plantillas)
+    return f"{significado_base} Es un nombre que evoca sentido en los momentos decisivos de la vida."
 
 def elegir_tipo(nombre: str, origen: str, preferidos: List[str]) -> str:
     lower = nombre.lower()
@@ -91,13 +119,14 @@ def elegir_tipo(nombre: str, origen: str, preferidos: List[str]) -> str:
     return random.choice(TIPOS)
 
 def generar_relato(nombre: str, tipo: str) -> str:
+    # Primero, revisamos si hay un relato específico para este nombre.
+    info_especifica = DATOS_ESPECIFICOS.get(nombre.lower())
+    if info_especifica and "relato" in info_especifica:
+        return info_especifica["relato"]
+
+    # Si no, usamos las plantillas genéricas como antes.
     plantilla = RELATOS_PLANTILLAS.get(tipo, RELATOS_PLANTILLAS["poética"])
-    relato_base = " ".join(plantilla.format(nombre=nombre).split())
-    
-    detalle_especifico = DATOS_ESPECIFICOS.get(nombre.lower())
-    if detalle_especifico:
-        return f"{detalle_especifico} {relato_base}"
-    return relato_base
+    return " ".join(plantilla.format(nombre=nombre).split())
 
 def procesar_fila(row: Dict[str,str], preferidos: List[str]) -> Dict:
     nombre = (row.get("Nombre") or row.get("nombre") or "").strip()
