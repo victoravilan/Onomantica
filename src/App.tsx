@@ -3,7 +3,7 @@ import { Search, LoaderCircle, WandSparkles, BookText, Users, Feather, Sword, Ge
 import type { NameData } from './types';
 import { loadDataset } from './lib/store';
 import { normalize } from './lib/diacritics';
-import { storyFromKnown, storyFromConstructed, meaningFromRoots } from './lib/generator';
+import { storyFromConstructed, meaningFromRoots } from './lib/generator';
 
 // --- Componentes de Tarjetas ---
 const NameCard = ({ item }: { item: NameData | null }) => {
@@ -14,12 +14,12 @@ const NameCard = ({ item }: { item: NameData | null }) => {
     const [p1, p2, p3, p4, p5] = paragraphs;
 
     const Section = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
-        <div className="mt-8">
-            <h4 className="flex items-center gap-3 font-serif text-xl text-amber-300/80 mb-3">
-                <Icon className="h-5 w-5 flex-shrink-0" />
+        <div className="mt-6">
+            <h4 className="flex items-center gap-2 font-serif text-lg text-amber-300/80 mb-2">
+                <Icon className="h-4 w-4" />
                 {title}
             </h4>
-            <p className="text-slate-300 text-base leading-relaxed pl-8">{children}</p>
+            <p className="text-slate-400 text-sm sm:text-base leading-relaxed">{children}</p>
         </div>
     );
 
@@ -92,8 +92,8 @@ function App() {
         const known = byName.get(key);
 
         if (known) {
-            setHit(known);
-            setFallbackResult(null);
+            setHit(known); // <-- ¡CORRECCIÓN CLAVE! Usa el dato del JSON directamente.
+            setFallbackResult(null); // Limpia el resultado de fallback.
         } else {
             // Modo Onomántica: generar al momento
             const synth = meaningFromRoots(name);
