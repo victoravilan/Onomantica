@@ -14,12 +14,12 @@ const NameCard = ({ item }: { item: NameData | null }) => {
     const [p1, p2, p3, p4, p5] = paragraphs;
 
     const Section = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon: React.ElementType }) => (
-        <div className="mt-6">
-            <h4 className="flex items-center gap-2 font-serif text-lg text-amber-300/80 mb-2">
-                <Icon className="h-4 w-4" />
+        <div className="mt-8">
+            <h4 className="flex items-center gap-3 font-serif text-xl text-amber-300/80 mb-3">
+                <Icon className="h-5 w-5 flex-shrink-0" />
                 {title}
             </h4>
-            <p className="text-slate-400 text-sm sm:text-base leading-relaxed">{children}</p>
+            <p className="text-slate-300 text-base leading-relaxed pl-8">{children}</p>
         </div>
     );
 
@@ -92,15 +92,13 @@ function App() {
         const known = byName.get(key);
 
         if (known) {
-            // **LA CORRECCIÓN CLAVE ESTÁ AQUÍ**
-            // Ahora simplemente usamos el 'known' que viene del JSON, que ya tiene los 5 párrafos.
             setHit(known);
-            setFallbackResult(null); // Limpiamos el resultado de fallback
+            setFallbackResult(null);
         } else {
             // Modo Onomántica: generar al momento
             const synth = meaningFromRoots(name);
             setHit(null);
-            const story = storyFromConstructed(name, synth.significado);
+            const story = storyFromConstructed(name);
             setFallbackResult({ name, data: synth, story });
         }
     };
