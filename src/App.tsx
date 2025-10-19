@@ -66,7 +66,35 @@ const generateOriginContent = (item: NombreItem | null, name: string): string =>
         
         'Pedro': 'Del latín "Petrus", que deriva del griego "Petros" (πέτρος), que significa "piedra" o "roca". Jesús dio este nombre a Simón, diciendo "tú eres Pedro, y sobre esta piedra edificaré mi iglesia". El nombre evoca solidez, fundamento y liderazgo espiritual. Representa la firmeza en la fe y la capacidad de ser base para otros.',
         
-        'Juan': 'Del hebreo "Yohanan" (יוֹחָנָן), que significa "Dios es misericordioso" o "gracia de Dios". Compuesto por "Yah" (Yahvé) y "hanan" (ser gracioso). Juan el Bautista y Juan el Evangelista son figuras centrales del cristianismo. El nombre evoca misericordia divina, testimonio y amor. Representa la gracia que transforma y la capacidad de dar testimonio de la verdad.'
+        'Juan': 'Del hebreo "Yohanan" (יוֹחָנָן), que significa "Dios es misericordioso" o "gracia de Dios". Compuesto por "Yah" (Yahvé) y "hanan" (ser gracioso). Juan el Bautista y Juan el Evangelista son figuras centrales del cristianismo. El nombre evoca misericordia divina, testimonio y amor. Representa la gracia que transforma y la capacidad de dar testimonio de la verdad.',
+        
+        'Elena': 'Del griego "Helene" (Ἑλένη), posiblemente derivado de "helios" (sol) o "selene" (luna). En la mitología griega, Helena de Troya fue considerada la mujer más bella del mundo. El nombre evoca luminosidad, belleza y magnetismo personal. Representa la capacidad de inspirar y la conexión con los ciclos celestiales.',
+        
+        'Roberto': 'Del germánico "Hrodebert", compuesto por "hrod" (gloria, fama) y "beraht" (brillante, ilustre). Significa "el que brilla por su gloria" o "famoso por su esplendor". Este nombre evoca liderazgo natural, carisma y la capacidad de destacar por méritos propios. Representa el equilibrio entre ambición noble y humildad.',
+        
+        'Carmen': 'Del latín "carmen", que significa "canto" o "poema". También se asocia con el Monte Carmelo en Israel, lugar sagrado de contemplación. En la tradición cristiana, la Virgen del Carmen es patrona de los marineros. El nombre evoca arte, espiritualidad y protección divina. Representa la belleza expresada a través de la creatividad.',
+        
+        'Fernando': 'Del germánico "Ferdinando", compuesto por "fardi" (viaje, expedición) y "nand" (audaz, valiente). Significa "viajero audaz" o "valiente en el camino". Este nombre real español evoca aventura, coraje y exploración. Representa el espíritu pionero y la valentía para emprender nuevos caminos.',
+        
+        'Lucía': 'Del latín "Lucia", derivado de "lux" (luz). Santa Lucía es patrona de la vista y la luz. El nombre evoca claridad, iluminación espiritual y sabiduría. En las tradiciones nórdicas, Santa Lucía trae luz en la época más oscura del año. Representa la capacidad de guiar a otros y disipar las tinieblas.',
+        
+        'Andrés': 'Del griego "Andreas" (Ἀνδρέας), derivado de "andros" (hombre, varón). San Andrés fue uno de los doce apóstoles, pescador llamado por Jesús. El nombre evoca masculinidad equilibrada, servicio y dedicación. Representa la fuerza puesta al servicio de ideales superiores.',
+        
+        'Beatriz': 'Del latín "Beatrix", que significa "la que hace feliz" o "portadora de bendiciones". Deriva de "beatus" (bendito, feliz). Beatriz fue la musa de Dante en la Divina Comedia, símbolo de amor puro y guía espiritual. El nombre evoca alegría, inspiración y elevación del alma.',
+        
+        'Ricardo': 'Del germánico "Ricohard", compuesto por "ric" (poder, dominio) y "hard" (fuerte, valiente). Significa "gobernante fuerte" o "poderoso y valiente". Ricardo Corazón de León fue un rey cruzado legendario. El nombre evoca liderazgo, determinación y justicia. Representa el poder ejercido con honor.',
+        
+        'Esperanza': 'Del latín "sperare", que significa "esperar" o "tener esperanza". Es una de las tres virtudes teologales cristianas junto con la fe y la caridad. El nombre evoca optimismo, confianza en el futuro y fortaleza espiritual. Representa la capacidad de mantener la luz interior en tiempos difíciles.',
+        
+        'Guillermo': 'Del germánico "Willahelm", compuesto por "willa" (voluntad, deseo) y "helm" (yelmo, protección). Significa "protector decidido" o "el que protege con voluntad firme". Guillermo el Conquistador cambió la historia de Inglaterra. El nombre evoca determinación, protección y liderazgo estratégico.',
+        
+        'Valentina': 'Del latín "Valentinus", derivado de "valens" (fuerte, vigoroso). Santa Valentina fue mártir cristiana. El nombre evoca fortaleza interior, coraje y capacidad de resistencia. Representa la valentía femenina y la determinación para defender los propios valores.',
+        
+        'Sebastián': 'Del griego "Sebastianos" (Σεβαστιανός), que significa "venerable" o "augusto". Deriva de "sebastos", título de honor equivalente al latín "augustus". San Sebastián fue mártir romano. El nombre evoca dignidad, honor y resistencia ante la adversidad.',
+        
+        'Cristina': 'Del latín "Christianus", que significa "seguidor de Cristo" o "cristiana". Santa Cristina fue mártir en el siglo III. El nombre evoca fe, devoción y pureza espiritual. Representa la conexión con lo divino y la capacidad de inspirar a otros a través del ejemplo.',
+        
+        'Rodrigo': 'Del germánico "Hrodric", compuesto por "hrod" (gloria, fama) y "ric" (poder, dominio). Significa "famoso por su poder" o "glorioso gobernante". Rodrigo fue el último rey visigodo de España. El nombre evoca nobleza, liderazgo y legado histórico.'
     };
     
     // Si tenemos información específica, usarla
