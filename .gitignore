@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+.vscode/
+.DS_Store
+Thumbs.db
+.env
+.env.*
+.vercel/
+.netlify/
+android/
+ios/

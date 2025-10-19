@@ -1,0 +1,5 @@
+# Configuración de Build para Netlify con Vite
+[build]
+  command = "npm run build" # o "vite build"
+  publish = "dist"
+  functions = "netlify/functions" # Directorio estándar para Netlify Functions

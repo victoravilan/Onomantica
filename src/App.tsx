@@ -1,0 +1,392 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { Search, LoaderCircle, WandSparkles, BookText, Users, Feather, Sword, Gem } from 'lucide-react';
+import type { NombreItem } from './types';
+import { loadDataset } from './lib/store';
+import { normalize } from './lib/diacritics';
+import { storyFromConstructed, meaningFromRoots } from './lib/generator';
+
+// --- Funciones de utilidad ---
+const parseSections = (significado: string): string[] => {
+    // Dividir por doble salto de línea y filtrar secciones vacías
+    return significado.split('\n\n').filter(section => section.trim().length > 0);
+};
+
+// Funciones para generar contenido específico de cada ventana
+const generateOriginContent = (item: NombreItem | null, name: string): string => {
+    if (item) {
+        const sections = parseSections(item.significado);
+        return sections[0] || `El nombre ${name} tiene raíces etimológicas que reflejan características de fortaleza y carácter distintivo.`;
+    }
+    
+    // Base de datos expandida de orígenes y significados reales
+    const nameOrigins: Record<string, string> = {
+        'Berna': 'De origen germánico, deriva de "Bern" que significa "oso". Históricamente asociado con la fuerza y protección. También es el nombre de la capital de Suiza, fundada en 1191 por Berthold V de Zähringen, quien según la leyenda le dio el nombre por el primer animal cazado en la zona: un oso. En el contexto religioso, San Bernardo de Claraval (1090-1153) popularizó este nombre en la tradición cristiana. El oso, en las culturas germánicas, simbolizaba la protección maternal y la conexión con los ciclos naturales.',
+        
+        'Margarita': 'Del latín "margarita" y del griego "margarites" (μαργαρίτης), que significa "perla". Este nombre evoca la belleza preciosa y la pureza. En la naturaleza, también se asocia con la flor margarita (Bellis perennis), símbolo de inocencia y amor puro. Geográficamente, es el nombre de la Isla de Margarita en Venezuela, descubierta por Cristóbal Colón en 1498 y nombrada así por las abundantes perlas encontradas en sus costas. En la tradición cristiana, Santa Margarita de Antioquía es patrona de las parturientas. Las perlas, formadas en las profundidades marinas, simbolizan la sabiduría nacida del sufrimiento transformado en belleza.',
+        
+        'Rosa': 'Del latín "rosa", directamente relacionado con la flor del mismo nombre. Simboliza la belleza, el amor y la pasión desde tiempos antiguos. En la mitología romana, la rosa estaba consagrada a Venus, diosa del amor. Este nombre evoca los atributos más hermosos de la naturaleza: fragancia, delicadeza y esplendor. Culturalmente, la rosa ha sido símbolo de secreto (sub rosa), amor cortés y devoción mariana en el cristianismo. En el Islam, la rosa representa la belleza divina, mientras que en el hinduismo simboliza el equilibrio. Su etimología se remonta al protoindoeuropeo *h₁reudhós (rojo), conectando el nombre con la pasión y la vitalidad.',
+        
+        'Victor': 'Del latín "victor", que significa "vencedor" o "conquistador". Deriva del verbo "vincere" (vencer), con raíces en el protoindoeuropeo *weik- (separar, conquistar). Este nombre romano clásico evoca triunfo, éxito y superación de obstáculos. En la tradición cristiana, muchos santos llevaron este nombre, simbolizando la victoria del bien sobre el mal. Su popularidad se extendió por Europa durante el Imperio Romano y resurgió en el siglo XIX. El concepto de victoria en Roma no solo implicaba conquista militar, sino también triunfo moral y espiritual.',
+        
+        'Luis': 'Del germánico "Hlodowig", compuesto por "hlod" (gloria, fama) y "wig" (combate, guerra), significando "guerrero glorioso" o "famoso en la batalla". Evolucionó al francés "Louis" y al español "Luis". Este nombre real por excelencia fue llevado por 18 reyes de Francia, siendo Luis IX (San Luis) canonizado por la Iglesia Católica. La transformación fonética del germánico al romance ilustra la evolución cultural europea. En la tradición franca, la gloria no se medía solo por victorias, sino por la justicia y protección del pueblo.',
+        
+        'Sofia': 'Del griego "Sophia" (Σοφία), que significa "sabiduría". Deriva del verbo "sophos" (sabio), con conexiones al protoindoeuropeo *seh₂p- (percibir, saber). En la filosofía griega antigua, Sophia representaba la sabiduría divina y el conocimiento supremo. En la tradición cristiana ortodoxa, Santa Sofía simboliza la Sabiduría Divina. El nombre evoca inteligencia, discernimiento y búsqueda de la verdad. Arquitectónicamente, la Hagia Sophia de Constantinopla fue dedicada a la Sabiduría Divina. En el gnosticismo, Sophia es la emanación divina femenina que conecta lo terrenal con lo celestial.',
+        
+        'Ana': 'Del hebreo "Hannah" (חַנָּה), que significa "gracia" o "compasión de Dios". Deriva de la raíz hebrea ḥ-n-n (mostrar favor, ser gracioso). En la tradición bíblica, Ana fue la madre del profeta Samuel, conocida por su fe y devoción. Este nombre evoca bondad, misericordia y favor divino. Su simplicidad y universalidad lo han convertido en uno de los nombres más extendidos en culturas cristianas, judías e islámicas. En el Nuevo Testamento, Ana la profetisa reconoció al niño Jesús en el templo. La gracia divina que representa trasciende las barreras culturales y religiosas.',
+        
+        'Carlos': 'Del germánico "Karl", que significa "hombre libre" o "varón". Deriva del protoindoeuropeo *ǵerh₂- (envejecer, madurar), sugiriendo sabiduría y experiencia. Este nombre evoca libertad, nobleza y liderazgo. Fue popularizado por Carlomagno (Carlos el Grande), emperador del Sacro Imperio Romano Germánico. La palabra "rey" en muchos idiomas eslavos deriva de "Karl", testimoniando su asociación con el poder y la realeza. En la sociedad germánica, ser "libre" implicaba no solo ausencia de servidumbre, sino también responsabilidad hacia la comunidad.',
+        
+        'Pablo': 'Del latín "Paulus", que significa "pequeño" o "humilde". Deriva del adjetivo latino "paulus" (poco, pequeño), posiblemente relacionado con el protoindoeuropeo *peh₂w- (poco, pequeño). Paradójicamente, este nombre evoca grandeza espiritual y transformación. San Pablo de Tarso, originalmente Saulo, se convirtió en el gran evangelizador del cristianismo. El nombre simboliza la capacidad de cambio, la humildad que conduce a la grandeza y la fuerza en la aparente debilidad. En la filosofía cristiana, la pequeñez se convierte en fortaleza a través de la fe.',
+        
+        'Isabel': 'Del hebreo "Elisheba" (אֱלִישֶׁבַע), que significa "Dios es mi juramento" o "consagrada a Dios". Compuesto por "El" (Dios) y "sheba" (juramento, siete - número de perfección). En la tradición bíblica, Isabel fue la madre de Juan el Bautista. Este nombre real evoca devoción, compromiso sagrado y nobleza espiritual. Ha sido llevado por numerosas reinas y santas, simbolizando la unión entre poder terrenal y devoción divina. El número siete en la cultura hebrea representa completitud y perfección divina.',
+        
+        'María': 'Del hebreo "Miryam" (מִרְיָם), posiblemente derivado de "mar" (amargo) o del egipcio "mry" (amada). Algunos eruditos sugieren conexión con "marah" (rebelión) o "mara" (señora). Es el nombre más venerado en el cristianismo por la Virgen María. En el judaísmo, Miriam fue la hermana de Moisés y Aarón, profetisa y líder. Su etimología incierta refleja la antigüedad y complejidad cultural del nombre. Representa maternidad divina, pureza y intercesión.',
+        
+        'José': 'Del hebreo "Yosef" (יוֹסֵף), que significa "Dios añadirá" o "que Dios multiplique". Deriva del verbo "yasaf" (añadir, aumentar). En el Antiguo Testamento, José fue el hijo predilecto de Jacob, vendido por sus hermanos y convertido en gobernador de Egipto. En el Nuevo Testamento, San José fue el padre adoptivo de Jesús. El nombre simboliza providencia divina, perdón y prosperidad a través de la adversidad. Representa la confianza en que Dios multiplica las bendiciones.',
+        
+        'Antonio': 'Del latín "Antonius", nombre de una antigua gens romana. Posiblemente deriva del griego "anthos" (flor) o del etrusco. Marco Antonio fue el famoso general romano. San Antonio de Padua y San Antonio Abad son figuras veneradas. El nombre evoca nobleza romana, liderazgo y devoción espiritual. En la tradición cristiana, representa la lucha contra las tentaciones y la búsqueda de la perfección espiritual.',
+        
+        'Francisco': 'Del latín "Franciscus", que significa "francés" o "hombre libre". Deriva de "Francus" (franco), pueblo germánico conocido por su libertad. San Francisco de Asís (1181-1226) transformó el significado del nombre, asociándolo con pobreza voluntaria, amor a la naturaleza y paz. El nombre evoca libertad espiritual, simplicidad y conexión con la creación. Representa la renuncia a lo material para encontrar la verdadera riqueza espiritual.',
+        
+        'Manuel': 'Del hebreo "Immanuel" (עִמָּנוּאֵל), que significa "Dios con nosotros". Compuesto por "im" (con), "anu" (nosotros) y "El" (Dios). Es un nombre mesiánico en la tradición judeo-cristiana, profetizado por Isaías. Representa la presencia divina entre los humanos, la esperanza y la salvación. En la cultura hispana, es especialmente venerado como advocación de Cristo. Simboliza la cercanía de lo divino en lo cotidiano.',
+        
+        'Carmen': 'Del latín "carmen", que significa "canto" o "poema". Deriva del protoindoeuropeo *kan- (cantar). En la tradición cristiana, se asocia con la Virgen del Carmen, patrona de los marineros. El Monte Carmelo en Israel fue hogar de profetas y ermitaños. El nombre evoca música, poesía y contemplación mística. Representa la belleza expresada a través del arte y la devoción espiritual.',
+        
+        'Teresa': 'Origen incierto, posiblemente del griego "therizo" (cosechar) o "theros" (verano). Algunos sugieren origen ibérico pre-romano. Santa Teresa de Ávila (1515-1582) y Santa Teresa de Lisieux son figuras místicas prominentes. El nombre evoca contemplación, reforma espiritual y unión mística con lo divino. Representa la búsqueda de la perfección interior y la experiencia directa de lo sagrado.',
+        
+        'Alejandro': 'Del griego "Alexandros" (Ἀλέξανδρος), compuesto por "alexo" (proteger, defender) y "andros" (hombre). Significa "el que protege a los hombres" o "defensor de la humanidad". Alejandro Magno (356-323 a.C.) extendió la cultura helenística hasta la India. El nombre evoca liderazgo, conquista y fusión cultural. Representa la capacidad de unir mundos diferentes bajo una visión común.',
+        
+        'Javier': 'Del euskera "Etxeberria", que significa "casa nueva". San Francisco Javier (1506-1552) fue misionero jesuita en Asia. El castillo de Javier en Navarra dio origen al apellido. El nombre evoca renovación, misión evangelizadora y apertura a culturas diferentes. Representa la construcción de nuevos hogares espirituales y la expansión de horizontes.',
+        
+        'Miguel': 'Del hebreo "Mikael" (מִיכָאֵל), que significa "¿quién como Dios?". Es una pregunta retórica que afirma la unicidad divina. En la tradición judeo-cristiana, Miguel es el arcángel guerrero que defiende al pueblo de Dios. El nombre evoca protección divina, justicia y lucha contra el mal. Representa la fuerza espiritual que defiende la verdad y la rectitud.',
+        
+        'David': 'Del hebreo "Dawid" (דָּוִד), que significa "amado" o "querido". Deriva de la raíz d-w-d (amar). El rey David fue el segundo rey de Israel, músico, poeta y guerrero. Los Salmos se le atribuyen tradicionalmente. El nombre evoca liderazgo inspirado, creatividad artística y devoción a Dios. Representa la unión entre poder temporal y sensibilidad espiritual.',
+        
+        'Daniel': 'Del hebreo "Daniyyel" (דָּנִיֵּאל), que significa "Dios es mi juez". Compuesto por "dan" (juzgar) y "El" (Dios). El profeta Daniel interpretó sueños en Babilonia y sobrevivió al foso de los leones. El nombre evoca sabiduría, interpretación de misterios y fe inquebrantable. Representa la confianza en la justicia divina y la capacidad de mantener la fe en adversidades.',
+        
+        'Pedro': 'Del latín "Petrus", que deriva del griego "Petros" (πέτρος), que significa "piedra" o "roca". Jesús dio este nombre a Simón, diciendo "tú eres Pedro, y sobre esta piedra edificaré mi iglesia". El nombre evoca solidez, fundamento y liderazgo espiritual. Representa la firmeza en la fe y la capacidad de ser base para otros.',
+        
+        'Juan': 'Del hebreo "Yohanan" (יוֹחָנָן), que significa "Dios es misericordioso" o "gracia de Dios". Compuesto por "Yah" (Yahvé) y "hanan" (ser gracioso). Juan el Bautista y Juan el Evangelista son figuras centrales del cristianismo. El nombre evoca misericordia divina, testimonio y amor. Representa la gracia que transforma y la capacidad de dar testimonio de la verdad.'
+    };
+    
+    // Si tenemos información específica, usarla
+    if (nameOrigins[name]) {
+        return nameOrigins[name];
+    }
+    
+    // Para nombres no catalogados, generar análisis etimológico básico
+    const analysis = meaningFromRoots(name);
+    return `El nombre ${name} ${analysis.significado} Aunque su etimología específica requiere investigación adicional, este nombre evoca características de personalidad distintivas y sugiere una herencia cultural rica que merece ser explorada más profundamente.`;
+};
+
+const generateLegacyContent = (name: string): string => {
+    // Base de personajes históricos por nombre (expandir según necesidad)
+    const historicalFigures: Record<string, string> = {
+        'Victor': 'Víctor Hugo (1802-1885), escritor francés autor de "Los Miserables" y "El Jorobado de Notre Dame", figura clave del romanticismo literario. Su obra influyó profundamente en la literatura mundial.',
+        'Luis': 'Luis XIV de Francia (1638-1715), conocido como el Rey Sol, monarca que llevó a Francia a su máximo esplendor cultural y político durante el siglo XVII.',
+        'Sofia': 'Sofía de Grecia (1938-2014), reina consorte de España, reconocida por su labor humanitaria y su papel en la transición democrática española.',
+        'Alejandro': 'Alejandro Magno (356-323 a.C.), rey de Macedonia cuyas conquistas crearon uno de los imperios más grandes de la historia antigua, extendiendo la cultura helenística.',
+        'Maria': 'María Curie (1867-1934), científica polaca-francesa, primera mujer en ganar un Premio Nobel y única persona en ganar Nobel en dos disciplinas científicas diferentes.',
+        'Carlos': 'Carlos Darwin (1809-1882), naturalista británico cuya teoría de la evolución revolucionó la comprensión científica de la vida en la Tierra.',
+        'Ana': 'Ana Frank (1929-1945), joven escritora alemana cuyo diario se convirtió en testimonio fundamental sobre el Holocausto y símbolo de esperanza.',
+        'Pablo': 'Pablo Picasso (1881-1973), pintor español cofundador del cubismo, una de las figuras más influyentes del arte del siglo XX.',
+        'Isabel': 'Isabel la Católica (1451-1504), reina de Castilla cuyo reinado marcó la unificación de España y el descubrimiento de América.',
+        'Miguel': 'Miguel de Cervantes (1547-1616), escritor español autor de "Don Quijote de la Mancha", considerada la primera novela moderna.'
+    };
+    
+    return historicalFigures[name] || `A lo largo de la historia, quienes han llevado el nombre ${name} se han distinguido por su capacidad de liderazgo y su contribución significativa a sus comunidades. Este nombre ha sido portado por figuras que han dejado huella en diversos campos del conocimiento y la cultura.`;
+};
+
+const generatePoeticContent = (name: string): string => {
+    const poeticTemplates = [
+        `En el susurro del viento se escucha ${name}, como eco de promesas antiguas. Su sonido despierta memorias de jardines donde florecen los sueños más puros, y cada sílaba es una llave que abre puertas hacia mundos de infinita belleza.`,
+        `${name} danza en el aire como luz dorada, tejiendo historias entre las estrellas. Su esencia abraza la tierra con ternura de madre, y en su nombre se refugian las esperanzas de quienes buscan la verdad en el silencio.`,
+        `Como río que fluye hacia el mar, ${name} lleva consigo la sabiduría de las montañas y la serenidad de los valles. En su pronunciación se encuentra la música que calma tormentas y enciende hogueras de inspiración.`,
+        `${name} es palabra que florece en labios de poetas, semilla de versos que germinan en corazones sensibles. Su melodía despierta al alba y arrulla a la noche, siendo puente entre lo terrenal y lo divino.`
+    ];
+    
+    const randomTemplate = poeticTemplates[Math.floor(Math.random() * poeticTemplates.length)];
+    return randomTemplate;
+};
+
+const generateEpicContent = (name: string): string => {
+    const epicTemplates = [
+        `En tiempos remotos, cuando los dioses aún caminaban entre mortales, ${name} emergió como guardián de antiguos secretos. Su valor resonaba en campos de batalla donde el honor se forjaba con acero y determinación, escribiendo leyendas que perdurarían por milenios.`,
+        `Las crónicas hablan de ${name} como figura que desafió destinos escritos en piedra. Con sabiduría de sabios y coraje de guerreros, transformó adversidades en victorias, convirtiéndose en faro de esperanza para generaciones venideras.`,
+        `En el gran tapiz de la historia, ${name} tejió hilos de oro con sus hazañas. Su nombre se pronunciaba en palacios y aldeas por igual, símbolo de justicia inquebrantable y visión que trascendía las limitaciones de su época.`,
+        `Cuando las sombras amenazaban con devorar la luz, ${name} se alzó como centinela de la verdad. Su legado perdura en cada acto de valentía, en cada decisión justa, recordándonos que la grandeza reside en el servicio a otros.`
+    ];
+    
+    const randomTemplate = epicTemplates[Math.floor(Math.random() * epicTemplates.length)];
+    return randomTemplate;
+};
+
+const calculateNumerology = (name: string): { number: number, meaning: string } => {
+    // Tabla de conversión numerológica
+    const letterValues: Record<string, number> = {
+        'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6, 'G': 7, 'H': 8, 'I': 9,
+        'J': 1, 'K': 2, 'L': 3, 'M': 4, 'N': 5, 'O': 6, 'P': 7, 'Q': 8, 'R': 9,
+        'S': 1, 'T': 2, 'U': 3, 'V': 4, 'W': 5, 'X': 6, 'Y': 7, 'Z': 8,
+        'Á': 1, 'É': 5, 'Í': 9, 'Ó': 6, 'Ú': 3, 'Ñ': 5
+    };
+    
+    // Calcular suma de letras
+    let sum = 0;
+    for (const char of name.toUpperCase()) {
+        if (letterValues[char]) {
+            sum += letterValues[char];
+        }
+    }
+    
+    // Reducir a un solo dígito (excepto 11, 22, 33)
+    while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+        sum = sum.toString().split('').reduce((acc, digit) => acc + parseInt(digit), 0);
+    }
+    
+    // Significados numerológicos
+    const meanings: Record<number, string> = {
+        1: "Liderazgo, independencia y originalidad. Representa el pionero, aquel que abre caminos con una energía y determinación únicas. Su reto es aprender a colaborar sin perder su individualidad.",
+        2: "Cooperación, diplomacia y sensibilidad. Es el número del mediador y el pacificador. Tiene un don natural para trabajar en equipo y crear armonía. Su lección es confiar en su intuición.",
+        3: "Creatividad, comunicación y expresión. Representa el artista y el comunicador nato. Posee un carisma natural y capacidad para inspirar a otros. Su desafío es mantener el enfoque.",
+        4: "Estructura, orden y pragmatismo. Representa la estabilidad y el trabajo duro. Es el número del constructor, que crea bases sólidas y valora la disciplina. Su poder es la constancia y la fiabilidad.",
+        5: "Libertad, aventura y cambio. Es el número del viajero y el explorador del espíritu. Ama la variedad y se adapta con facilidad a nuevas situaciones. Su lección es usar su libertad con responsabilidad.",
+        6: "Responsabilidad, cuidado y servicio. Representa el cuidador y el sanador natural. Tiene una fuerte conexión con la familia y la comunidad. Su misión es nutrir y proteger a otros.",
+        7: "Espiritualidad, introspección y sabiduría. Es el número del místico y el investigador. Busca la verdad profunda y tiene una conexión especial con lo espiritual. Su reto es no aislarse del mundo.",
+        8: "Poder, ambición y materialización. Representa el éxito material y la autoridad. Es el número del estratega, que sabe manifestar sus visiones en el mundo real. Su reto es equilibrar lo material con lo espiritual.",
+        9: "Humanitarismo, compasión y finalización. Es el número del idealista y el filántropo. Tiene una visión global y un profundo amor por la humanidad. Su misión es servir desinteresadamente y cerrar ciclos.",
+        11: "Intuición, inspiración y iluminación. Es un número maestro que representa la conexión espiritual elevada. Posee una sensibilidad psíquica natural y capacidad visionaria.",
+        22: "Construcción en gran escala y manifestación de sueños. Es el 'Maestro Constructor' que puede materializar visiones grandiosas en la realidad física.",
+        33: "Maestría espiritual y servicio universal. Representa la compasión elevada y la capacidad de sanar y enseñar a nivel global."
+    };
+    
+    return {
+        number: sum,
+        meaning: meanings[sum] || "Número con vibración especial que combina múltiples influencias numerológicas."
+    };
+};
+
+// Función principal para generar las 5 ventanas
+const generateFiveWindows = (item: NombreItem | null, name: string): { title: string, content: string, icon: React.ElementType, emoji: string }[] => {
+    const numerology = calculateNumerology(name);
+    
+    return [
+        {
+            title: "Origen y Significado",
+            content: generateOriginContent(item, name),
+            icon: BookText,
+            emoji: "📚"
+        },
+        {
+            title: "Legado y Personajes",
+            content: generateLegacyContent(name),
+            icon: Users,
+            emoji: "👥"
+        },
+        {
+            title: "Relato Poético",
+            content: generatePoeticContent(name),
+            icon: Feather,
+            emoji: "🪶"
+        },
+        {
+            title: "Narrativa Épica",
+            content: generateEpicContent(name),
+            icon: Sword,
+            emoji: "⚔️"
+        },
+        {
+            title: "Numerología",
+            content: `El nombre ${name} resuena con la vibración del número ${numerology.number}. ${numerology.meaning}`,
+            icon: Gem,
+            emoji: "🔢"
+        }
+    ];
+};
+
+// Configuración de las cinco ventanas/tarjetas
+const windowConfig = [
+    { id: "origen", title: "Origen y Significado", icon: BookText, emoji: "📚" },
+    { id: "legado", title: "Legado y Personajes", icon: Users, emoji: "👥" },
+    { id: "poetica", title: "Relato Poético", icon: Feather, emoji: "🪶" },
+    { id: "epica", title: "Narrativa Épica", icon: Sword, emoji: "⚔️" },
+    { id: "numerologia", title: "Numerología", icon: Gem, emoji: "🔢" }
+];
+
+// --- Componentes de Tarjetas ---
+const NameWindow = ({ title, content, icon: Icon, emoji, nombre }: { 
+    title: string, 
+    content: string, 
+    icon: React.ElementType, 
+    emoji: string,
+    nombre: string 
+}) => (
+    <div className="group relative bg-gradient-to-br from-slate-800/60 via-slate-800/40 to-slate-900/60 backdrop-blur-sm rounded-xl p-6 border border-amber-900/20 transition-all duration-500 hover:border-amber-600/40 hover:shadow-lg hover:shadow-amber-900/10 hover:scale-[1.02]">
+        {/* Efecto de brillo sutil */}
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-400/5 via-transparent to-amber-600/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        <div className="relative z-10">
+            <div className="flex items-center gap-4 mb-5">
+                <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-amber-400/20 to-amber-600/20 rounded-full border border-amber-500/30 group-hover:border-amber-400/50 transition-colors duration-300">
+                    <span className="text-2xl filter drop-shadow-sm">{emoji}</span>
+                </div>
+                <div className="flex-1">
+                    <h3 className="font-serif text-xl text-amber-200 group-hover:text-amber-100 transition-colors duration-300 tracking-wide">{title}</h3>
+                    <p className="text-xs text-amber-600/70 font-medium tracking-wider uppercase">{nombre}</p>
+                </div>
+            </div>
+            
+            <div className="relative">
+                <p className="text-slate-200 text-sm leading-relaxed font-light tracking-wide text-justify first-letter:text-2xl first-letter:font-serif first-letter:text-amber-300 first-letter:float-left first-letter:mr-2 first-letter:mt-1">
+                    {content}
+                </p>
+                
+                {/* Decoración sutil en la esquina */}
+                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-gradient-to-br from-amber-400/10 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            </div>
+        </div>
+    </div>
+);
+
+const NameResults = ({ item, name }: { item: NombreItem | null, name: string }) => {
+    // Generar siempre las 5 ventanas usando la función generateFiveWindows
+    const windows = generateFiveWindows(item, name);
+    
+    // Determinar información del encabezado
+    const displayName = item?.nombre || name;
+    const origin = item?.origen || 'Origen Mixto';
+    const gender = item?.genero === 'M' ? 'Masculino' : item?.genero === 'F' ? 'Femenino' : 'Unisex';
+
+    return (
+        <div className="w-full space-y-6">
+            {/* Encabezado del nombre */}
+            <div className="text-center mb-8">
+                <h2 className="font-serif text-4xl text-amber-300 mb-2">{displayName}</h2>
+                <p className="text-slate-400">{origin} • {gender}</p>
+            </div>
+
+            {/* Las cinco ventanas - SIEMPRE 5 */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {windows.map((window, index) => (
+                    <NameWindow
+                        key={windowConfig[index].id}
+                        title={window.title}
+                        content={window.content}
+                        icon={window.icon}
+                        emoji={window.emoji}
+                        nombre={displayName}
+                    />
+                ))}
+            </div>
+        </div>
+    );
+};
+
+const FallbackCard = ({ name, data, story }: { name: string, data: { origen: string, significado: string }, story: { tipo: string, relato: string } }) => (
+    <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700/50 transition-all hover:border-slate-600 hover:bg-slate-800">
+        <div className="flex justify-between items-start">
+            <h3 className="font-serif text-2xl text-amber-300">{name}</h3>
+            <span className="flex items-center gap-2 text-xs text-purple-300 bg-purple-900/50 px-2 py-1 rounded-full">
+                <WandSparkles className="h-3 w-3" />
+                Generado
+            </span>
+        </div>
+        <p className="text-sm text-slate-400 mb-4">{data.origen}</p>
+        <p className="mb-4 text-slate-300">{data.significado}</p>
+        <div className="border-t border-slate-700 pt-4">
+            <p className="text-sm font-semibold text-amber-400/80 mb-2 capitalize">{story.tipo.replace(/a$/, 'a')}</p>
+            <p className="text-slate-400 text-sm whitespace-pre-wrap">{story.relato}</p>
+        </div>
+    </div>
+);
+
+function App() {
+    const [raw, setRaw] = useState<NombreItem[] | null>(null);
+    const [q, setQ] = useState('');
+    const [hit, setHit] = useState<NombreItem | null>(null);
+    const [fallbackResult, setFallbackResult] = useState<{ name: string, data: any, story: any } | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [searched, setSearched] = useState(false);
+
+    useEffect(() => {
+        loadDataset().then(data => {
+            setRaw(data);
+            setLoading(false);
+        });
+    }, []);
+
+    const byName = useMemo(() => {
+        if (!raw) return new Map<string, NombreItem>();
+        const m = new Map<string, NombreItem>();
+        for (const r of raw) m.set(normalize(r.nombre), r);
+        return m;
+    }, [raw]);
+
+    const handleSearch = (query: string) => {
+        const name = query.trim();
+        setSearched(true);
+        if (!name) {
+            setHit(null);
+            setFallbackResult(null);
+            return;
+        }
+
+        const key = normalize(name);
+        const known = byName.get(key);
+
+        // Siempre usar NameResults para mostrar las 5 ventanas
+        setHit(known || null);
+        setFallbackResult({ name, data: null, story: null });
+    };
+
+    return (
+        <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 sm:p-8 flex flex-col items-center relative overflow-hidden">
+            {/* Efectos de fondo místicos */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/10 via-transparent to-transparent"></div>
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-400/5 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-600/5 rounded-full blur-3xl"></div>
+            
+            <div className="relative z-10 w-full max-w-3xl mx-auto text-center mt-12 mb-12">
+                <div className="relative mb-6">
+                    <img src="/img/logo-onomantica.png" alt="Logo de Onomántica" className="w-24 h-24 mx-auto mb-4 filter drop-shadow-lg" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/20 to-transparent blur-xl"></div>
+                </div>
+                <h1 className="font-serif text-5xl sm:text-6xl font-bold bg-gradient-to-r from-amber-200 via-amber-300 to-amber-200 bg-clip-text text-transparent tracking-wider mb-2">
+                    Onomántica
+                </h1>
+                <div className="w-32 h-px bg-gradient-to-r from-transparent via-amber-400/60 to-transparent mx-auto mb-4"></div>
+                <p className="text-slate-400 text-lg font-light tracking-wide">Descubre la historia y el alma detrás de cada nombre</p>
+            </div>
+
+            <form onSubmit={(e) => { e.preventDefault(); handleSearch(q); }} className="relative w-full max-w-md mb-12">
+                <div className="relative group">
+                    <input
+                        type="text"
+                        placeholder="Busca un nombre..."
+                        value={q}
+                        onChange={(e) => setQ(e.target.value)}
+                        className="w-full pl-12 pr-4 py-4 bg-slate-800/60 backdrop-blur-sm border border-amber-900/30 rounded-full focus:ring-2 focus:ring-amber-400/50 focus:border-amber-500/50 focus:outline-none transition-all duration-300 text-slate-200 placeholder-slate-500 font-light tracking-wide"
+                    />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-amber-600/70 group-focus-within:text-amber-400 transition-colors duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-amber-400/5 via-transparent to-amber-600/5 rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                </div>
+            </form>
+
+            {loading && (
+                <div className="flex items-center gap-2 text-slate-500">
+                    <LoaderCircle className="animate-spin h-5 w-5" />
+                    <span>Cargando conocimiento...</span>
+                </div>
+            )}
+
+            {!loading && searched && !hit && !fallbackResult && q && (
+                <p className="text-slate-500">No se encontraron resultados para "{q}".</p>
+            )}
+
+            <div className="w-full max-w-6xl mx-auto">
+                {fallbackResult && <NameResults item={hit} name={fallbackResult.name} />}
+            </div>
+        </main>
+    );
+}
+
+export default App;
