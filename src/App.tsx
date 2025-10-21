@@ -396,8 +396,10 @@ function App() {
     };
 
     const handleShare = (name: string, item: NombreItem | null) => {
+        console.log('handleShare called with:', name, item);
         setShareData({ name, item });
         setShareModalOpen(true);
+        console.log('Modal should open now');
     };
 
     return (
