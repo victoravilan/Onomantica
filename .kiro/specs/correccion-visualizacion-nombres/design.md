@@ -60,6 +60,51 @@ const sectionConfig = [
 ];
 ```
 
+### 5. Componente Modal/Dialog
+```typescript
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  children: React.ReactNode;
+}
+
+interface ShareModalProps extends ModalProps {
+  nameData: NombreItem;
+  shareUrl: string;
+}
+```
+
+### 6. Componente SearchInput con Lupa
+```typescript
+interface SearchInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  onSearch: () => void;
+  placeholder?: string;
+  disabled?: boolean;
+}
+```
+
+### 7. Funcionalidad de Compartir
+```typescript
+interface ShareOptions {
+  copyLink: () => Promise<void>;
+  shareWhatsApp: (text: string, url: string) => void;
+  shareFacebook: (url: string) => void;
+  shareTwitter: (text: string, url: string) => void;
+  generateImage: (nameData: NombreItem) => Promise<string>;
+}
+```
+
+### 8. Footer Component
+```typescript
+interface FooterProps {
+  author: string;
+  className?: string;
+}
+```
+
 ## Data Models
 
 ### NombreItem (Existente - Correcto)
@@ -138,14 +183,47 @@ Párrafo 5: Numerología y vibración numérica
 - Tamaño y color consistente
 - Alineación correcta con títulos
 
+### 4. Ventanas Flotantes (Modal/Dialog)
+- Implementar sistema de ventanas flotantes para mostrar información detallada
+- Usar componentes de diálogo con fondo semi-transparente
+- Animaciones suaves de entrada y salida
+- Botón de cierre (X) en la esquina superior derecha
+- Soporte para cerrar con tecla Escape o clic fuera del modal
+
+### 5. Funcionalidad de Compartir
+- Botón "Compartir" prominente en los resultados
+- Opciones de compartir:
+  - Copiar enlace al portapapeles
+  - Compartir en redes sociales (WhatsApp, Facebook, Twitter)
+  - Generar imagen para compartir con el resultado
+- Feedback visual cuando se copia o comparte exitosamente
+
+### 6. Búsqueda con Lupa
+- Ícono de lupa (Search) integrado en el campo de búsqueda
+- Posición: dentro del campo de entrada, lado derecho
+- Funcionalidad: iniciar búsqueda al hacer clic
+- Estados visuales: hover, active, disabled
+- Accesibilidad: soporte para Enter y clic
+
+### 7. Footer con Créditos
+- Línea fija en la parte inferior de la página
+- Texto: "Creado por Victor M.F. Avilan"
+- Estilo: discreto pero visible, tipografía pequeña
+- Color: tono dorado suave para mantener coherencia
+- Posición: centrado horizontalmente
+
 ## Implementation Notes
 
 ### Prioridades de Corrección
 1. **Crítico**: Corregir tipo `NameData` → `NombreItem`
 2. **Crítico**: Implementar división correcta de párrafos
 3. **Alto**: Mostrar las cinco secciones con títulos e íconos
-4. **Medio**: Mejorar diseño visual según imágenes de referencia
-5. **Bajo**: Optimizaciones de rendimiento
+4. **Alto**: Implementar búsqueda con lupa integrada
+5. **Alto**: Agregar footer con créditos "Creado por Victor M.F. Avilan"
+6. **Medio**: Implementar sistema de ventanas flotantes (modales)
+7. **Medio**: Agregar funcionalidad de compartir resultados
+8. **Medio**: Mejorar diseño visual según imágenes de referencia
+9. **Bajo**: Optimizaciones de rendimiento
 
 ### Compatibilidad
 - Mantener funcionalidad existente para nombres generados

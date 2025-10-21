@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, LoaderCircle, WandSparkles, BookText, Users, Feather, Sword, Gem } from 'lucide-react';
+import { Search, LoaderCircle, WandSparkles, BookText, Users, Feather, Sword, Gem, Share2, Mail, Download } from 'lucide-react';
 import type { NombreItem } from './types';
 import { loadDataset } from './lib/store';
 import { normalize } from './lib/diacritics';
@@ -264,7 +264,7 @@ const NameWindow = ({ title, content, icon: Icon, emoji, nombre }: {
             </div>
             
             <div className="relative">
-                <p className="text-slate-200 text-sm leading-relaxed font-light tracking-wide text-justify first-letter:text-2xl first-letter:font-serif first-letter:text-amber-300 first-letter:float-left first-letter:mr-2 first-letter:mt-1">
+                <p className="text-slate-100 text-sm sm:text-base leading-relaxed font-light tracking-wide text-justify first-letter:text-3xl first-letter:font-serif first-letter:text-amber-300 first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:leading-none">
                     {content}
                 </p>
                 
@@ -275,7 +275,11 @@ const NameWindow = ({ title, content, icon: Icon, emoji, nombre }: {
     </div>
 );
 
-const NameResults = ({ item, name }: { item: NombreItem | null, name: string }) => {
+const NameResults = ({ item, name, onShare }: { 
+    item: NombreItem | null, 
+    name: string,
+    onShare: (name: string, item: NombreItem | null) => void 
+}) => {
     // Generar siempre las 5 ventanas usando la función generateFiveWindows
     const windows = generateFiveWindows(item, name);
     
@@ -287,13 +291,33 @@ const NameResults = ({ item, name }: { item: NombreItem | null, name: string }) 
     return (
         <div className="w-full space-y-6">
             {/* Encabezado del nombre */}
-            <div className="text-center mb-8">
-                <h2 className="font-serif text-4xl text-amber-300 mb-2">{displayName}</h2>
-                <p className="text-slate-400">{origin} • {gender}</p>
+            <div className="text-center mb-12">
+                <div className="relative inline-block">
+                    <h2 className="font-serif text-5xl sm:text-6xl font-bold bg-gradient-to-r from-amber-200 via-amber-300 to-amber-200 bg-clip-text text-transparent mb-4 tracking-wide">
+                        {displayName}
+                    </h2>
+                    <div className="absolute -inset-2 bg-gradient-to-r from-amber-400/10 via-amber-300/20 to-amber-400/10 blur-xl rounded-lg opacity-50"></div>
+                </div>
+                <div className="flex items-center justify-center gap-3 text-slate-400 text-lg mb-6">
+                    <span className="px-3 py-1 bg-slate-800/50 rounded-full border border-amber-900/30">{origin}</span>
+                    <span className="w-2 h-2 bg-amber-500/50 rounded-full"></span>
+                    <span className="px-3 py-1 bg-slate-800/50 rounded-full border border-amber-900/30">{gender}</span>
+                </div>
+                
+                {/* Botón de compartir */}
+                <button
+                    onClick={() => onShare(displayName, item)}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-600/20 to-amber-500/20 border border-amber-500/30 rounded-full text-amber-200 hover:from-amber-500/30 hover:to-amber-400/30 hover:border-amber-400/50 hover:text-amber-100 transition-all duration-300 group"
+                >
+                    <svg className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                    </svg>
+                    Compartir
+                </button>
             </div>
 
             {/* Las cinco ventanas - SIEMPRE 5 */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
                 {windows.map((window, index) => (
                     <NameWindow
                         key={windowConfig[index].id}
@@ -334,6 +358,11 @@ function App() {
     const [fallbackResult, setFallbackResult] = useState<{ name: string, data: any, story: any } | null>(null);
     const [loading, setLoading] = useState(true);
     const [searched, setSearched] = useState(false);
+    
+    // Estados para modales
+    const [shareModalOpen, setShareModalOpen] = useState(false);
+    const [shareData, setShareData] = useState<{ name: string, item: NombreItem | null } | null>(null);
+    const [copySuccess, setCopySuccess] = useState(false);
 
     useEffect(() => {
         loadDataset().then(data => {
@@ -366,6 +395,11 @@ function App() {
         setFallbackResult({ name, data: null, story: null });
     };
 
+    const handleShare = (name: string, item: NombreItem | null) => {
+        setShareData({ name, item });
+        setShareModalOpen(true);
+    };
+
     return (
         <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 sm:p-8 flex flex-col items-center relative overflow-hidden">
             {/* Efectos de fondo místicos */}
@@ -392,9 +426,15 @@ function App() {
                         placeholder="Busca un nombre..."
                         value={q}
                         onChange={(e) => setQ(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 bg-slate-800/60 backdrop-blur-sm border border-amber-900/30 rounded-full focus:ring-2 focus:ring-amber-400/50 focus:border-amber-500/50 focus:outline-none transition-all duration-300 text-slate-200 placeholder-slate-500 font-light tracking-wide"
+                        className="w-full pl-6 pr-14 py-4 bg-slate-800/60 backdrop-blur-sm border border-amber-900/30 rounded-full focus:ring-2 focus:ring-amber-400/50 focus:border-amber-500/50 focus:outline-none transition-all duration-300 text-slate-200 placeholder-slate-500 font-light tracking-wide"
                     />
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-amber-600/70 group-focus-within:text-amber-400 transition-colors duration-300" />
+                    <button
+                        type="submit"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-amber-600/20 hover:bg-amber-500/30 focus:bg-amber-500/30 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-amber-400/50"
+                        aria-label="Buscar nombre"
+                    >
+                        <Search className="h-5 w-5 text-amber-400 group-hover:text-amber-300 transition-colors duration-300" />
+                    </button>
                     <div className="absolute inset-0 bg-gradient-to-r from-amber-400/5 via-transparent to-amber-600/5 rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                 </div>
             </form>
@@ -411,10 +451,308 @@ function App() {
             )}
 
             <div className="w-full max-w-6xl mx-auto">
-                {fallbackResult && <NameResults item={hit} name={fallbackResult.name} />}
+                {fallbackResult && <NameResults item={hit} name={fallbackResult.name} onShare={handleShare} />}
             </div>
+            
+            {/* Modales */}
+            <ShareModal 
+                isOpen={shareModalOpen} 
+                onClose={() => setShareModalOpen(false)}
+                name={shareData?.name || ''}
+                item={shareData?.item || null}
+                copySuccess={copySuccess}
+                setCopySuccess={setCopySuccess}
+            />
+            
+            {/* Footer con créditos */}
+            <Footer />
         </main>
     );
 }
+
+// Componente Modal base reutilizable
+const Modal = ({ isOpen, onClose, title, children }: {
+    isOpen: boolean;
+    onClose: () => void;
+    title: string;
+    children: React.ReactNode;
+}) => {
+    // Cerrar con tecla Escape
+    React.useEffect(() => {
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose();
+        };
+        
+        if (isOpen) {
+            document.addEventListener('keydown', handleEscape);
+            document.body.style.overflow = 'hidden';
+        }
+        
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen, onClose]);
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Overlay */}
+            <div 
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+                onClick={onClose}
+            />
+            
+            {/* Modal Content */}
+            <div className="relative bg-gradient-to-br from-slate-800 via-slate-800/95 to-slate-900 rounded-2xl border border-amber-900/30 shadow-2xl shadow-black/50 max-w-2xl w-full max-h-[90vh] overflow-hidden animate-in zoom-in-95 fade-in duration-300">
+                {/* Header */}
+                <div className="flex items-center justify-between p-6 border-b border-amber-900/20">
+                    <h2 className="text-2xl font-serif text-amber-200 tracking-wide">{title}</h2>
+                    <button
+                        onClick={onClose}
+                        className="p-2 rounded-full hover:bg-amber-900/20 transition-colors duration-200 group"
+                        aria-label="Cerrar modal"
+                    >
+                        <svg className="w-6 h-6 text-amber-600 group-hover:text-amber-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
+                {/* Content */}
+                <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                    {children}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Funciones de compartir
+const shareUtils = {
+    copyToClipboard: async (text: string): Promise<boolean> => {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (err) {
+            // Fallback para navegadores que no soportan clipboard API
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            const success = document.execCommand('copy');
+            document.body.removeChild(textArea);
+            return success;
+        }
+    },
+    
+    shareWhatsApp: (text: string, url: string) => {
+        const message = encodeURIComponent(`${text}\n\n${url}`);
+        window.open(`https://wa.me/?text=${message}`, '_blank');
+    },
+    
+    shareFacebook: (url: string) => {
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+    },
+    
+    shareTwitter: (text: string, url: string) => {
+        const tweet = encodeURIComponent(`${text} ${url}`);
+        window.open(`https://twitter.com/intent/tweet?text=${tweet}`, '_blank');
+    },
+    
+    shareEmail: (subject: string, body: string) => {
+        const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        window.location.href = mailtoLink;
+    },
+    
+    downloadAsText: (content: string, filename: string) => {
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    },
+    
+    generateFullContent: (name: string, item: NombreItem | null): string => {
+        const windows = generateFiveWindows(item, name);
+        const displayName = item?.nombre || name;
+        const origin = item?.origen || 'Origen Mixto';
+        const gender = item?.genero === 'M' ? 'Masculino' : item?.genero === 'F' ? 'Femenino' : 'Unisex';
+        
+        let content = `ONOMÁNTICA - El poder de tu nombre\n`;
+        content += `==========================================\n\n`;
+        content += `NOMBRE: ${displayName}\n`;
+        content += `ORIGEN: ${origin}\n`;
+        content += `GÉNERO: ${gender}\n\n`;
+        
+        windows.forEach((window, index) => {
+            content += `${index + 1}. ${window.title.toUpperCase()}\n`;
+            content += `${'='.repeat(window.title.length + 3)}\n`;
+            content += `${window.content}\n\n`;
+        });
+        
+        content += `\n--\n`;
+        content += `Generado por Onomántica - El poder de tu nombre\n`;
+        content += `${window.location.origin}\n`;
+        content += `Creado por Victor M.F. Avilan`;
+        
+        return content;
+    }
+};
+
+// Componente ShareModal
+const ShareModal = ({ isOpen, onClose, name, item, copySuccess, setCopySuccess }: {
+    isOpen: boolean;
+    onClose: () => void;
+    name: string;
+    item: NombreItem | null;
+    copySuccess: boolean;
+    setCopySuccess: (success: boolean) => void;
+}) => {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?nombre=${encodeURIComponent(name)}`;
+    const shareText = `Descubre el significado del nombre "${name}" en Onomántica - El poder de tu nombre`;
+
+    const handleCopyLink = async () => {
+        const success = await shareUtils.copyToClipboard(shareUrl);
+        setCopySuccess(success);
+        if (success) {
+            setTimeout(() => setCopySuccess(false), 3000);
+        }
+    };
+
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} title="Compartir Resultado">
+            <div className="space-y-6">
+                <div className="text-center">
+                    <h3 className="text-xl font-serif text-amber-200 mb-2">"{name}"</h3>
+                    <p className="text-slate-300 text-sm">Comparte este resultado con tus amigos</p>
+                </div>
+
+                {/* Botón copiar enlace */}
+                <div className="space-y-3">
+                    <button
+                        onClick={handleCopyLink}
+                        className={`w-full p-4 rounded-xl border transition-all duration-300 flex items-center justify-center gap-3 ${
+                            copySuccess 
+                                ? 'bg-green-600/20 border-green-500/50 text-green-300' 
+                                : 'bg-amber-600/20 border-amber-500/30 text-amber-200 hover:bg-amber-500/30 hover:border-amber-400/50'
+                        }`}
+                    >
+                        {copySuccess ? (
+                            <>
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                ¡Enlace copiado!
+                            </>
+                        ) : (
+                            <>
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                Copiar enlace
+                            </>
+                        )}
+                    </button>
+                </div>
+
+                {/* Botones de redes sociales */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <button
+                        onClick={() => shareUtils.shareWhatsApp(shareText, shareUrl)}
+                        className="p-4 rounded-xl bg-green-600/20 border border-green-500/30 text-green-300 hover:bg-green-500/30 hover:border-green-400/50 transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                        </svg>
+                        WhatsApp
+                    </button>
+
+                    <button
+                        onClick={() => shareUtils.shareFacebook(shareUrl)}
+                        className="p-4 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30 hover:border-blue-400/50 transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                        Facebook
+                    </button>
+
+                    <button
+                        onClick={() => shareUtils.shareTwitter(shareText, shareUrl)}
+                        className="p-4 rounded-xl bg-sky-600/20 border border-sky-500/30 text-sky-300 hover:bg-sky-500/30 hover:border-sky-400/50 transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                        </svg>
+                        Twitter
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            const emailSubject = `Significado del nombre "${name}" - Onomántica`;
+                            const emailBody = `${shareText}\n\n${shareUrl}\n\nDescubre más nombres en Onomántica - El poder de tu nombre`;
+                            shareUtils.shareEmail(emailSubject, emailBody);
+                        }}
+                        className="p-4 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30 hover:border-purple-400/50 transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                        <Mail className="w-5 h-5" />
+                        Correo
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            const fullContent = shareUtils.generateFullContent(name, shareData?.item || null);
+                            shareUtils.downloadAsText(fullContent, `${name}_Onomantica.txt`);
+                        }}
+                        className="p-4 rounded-xl bg-amber-600/20 border border-amber-500/30 text-amber-300 hover:bg-amber-500/30 hover:border-amber-400/50 transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                        <Download className="w-5 h-5" />
+                        Descargar
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            if (navigator.share) {
+                                navigator.share({
+                                    title: `Significado del nombre "${name}"`,
+                                    text: shareText,
+                                    url: shareUrl
+                                }).catch(console.error);
+                            } else {
+                                // Fallback: copiar al portapapeles
+                                shareUtils.copyToClipboard(`${shareText}\n${shareUrl}`);
+                            }
+                        }}
+                        className="p-4 rounded-xl bg-slate-600/20 border border-slate-500/30 text-slate-300 hover:bg-slate-500/30 hover:border-slate-400/50 transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                        <Share2 className="w-5 h-5" />
+                        Más opciones
+                    </button>
+                </div>
+
+                <div className="text-center text-xs text-slate-500">
+                    Comparte el poder de los nombres con el mundo
+                </div>
+            </div>
+        </Modal>
+    );
+};
+
+// Componente Footer con créditos
+const Footer = () => (
+    <footer className="mt-16 py-6 border-t border-amber-900/20">
+        <div className="text-center">
+            <p className="text-amber-600/70 text-sm font-light tracking-wide">
+                Creado por Victor M.F. Avilan
+            </p>
+        </div>
+    </footer>
+);
 
 export default App;
