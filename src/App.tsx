@@ -304,25 +304,32 @@ const NameResults = ({ item, name, onShare }: {
                     <span className="px-3 py-1 bg-slate-800/50 rounded-full border border-amber-900/30">{gender}</span>
                 </div>
                 
-                {/* Botón de compartir simple */}
-                <button
+                {/* Botón de compartir directo */}
+                <div 
                     onClick={() => {
-                        alert('¡Botón funciona!');
-                        onShare(displayName, item);
+                        alert('¡FUNCIONA!');
+                        const shareUrl = `${window.location.origin}${window.location.pathname}?nombre=${encodeURIComponent(displayName)}`;
+                        const shareText = `Descubre el significado del nombre "${displayName}" en Onomántica`;
+                        const message = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
+                        window.open(`https://wa.me/?text=${message}`, '_blank');
                     }}
                     style={{
-                        padding: '12px 24px',
-                        backgroundColor: '#f59e0b',
+                        padding: '15px 30px',
+                        backgroundColor: '#ff6b35',
                         color: 'white',
-                        border: 'none',
-                        borderRadius: '25px',
+                        borderRadius: '30px',
                         cursor: 'pointer',
-                        fontSize: '16px',
-                        fontWeight: 'bold'
+                        fontSize: '18px',
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                        margin: '20px auto',
+                        display: 'inline-block',
+                        border: '3px solid #fff',
+                        boxShadow: '0 4px 15px rgba(255, 107, 53, 0.4)'
                     }}
                 >
-                    🔗 COMPARTIR
-                </button>
+                    📱 COMPARTIR EN WHATSAPP
+                </div>
             </div>
 
             {/* Las cinco ventanas - SIEMPRE 5 */}
