@@ -304,32 +304,16 @@ const NameResults = ({ item, name, onShare }: {
                     <span className="px-3 py-1 bg-slate-800/50 rounded-full border border-amber-900/30">{gender}</span>
                 </div>
                 
-                {/* Botón de compartir directo */}
-                <div 
-                    onClick={() => {
-                        alert('¡FUNCIONA!');
-                        const shareUrl = `${window.location.origin}${window.location.pathname}?nombre=${encodeURIComponent(displayName)}`;
-                        const shareText = `Descubre el significado del nombre "${displayName}" en Onomántica`;
-                        const message = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
-                        window.open(`https://wa.me/?text=${message}`, '_blank');
-                    }}
-                    style={{
-                        padding: '15px 30px',
-                        backgroundColor: '#ff6b35',
-                        color: 'white',
-                        borderRadius: '30px',
-                        cursor: 'pointer',
-                        fontSize: '18px',
-                        fontWeight: 'bold',
-                        textAlign: 'center',
-                        margin: '20px auto',
-                        display: 'inline-block',
-                        border: '3px solid #fff',
-                        boxShadow: '0 4px 15px rgba(255, 107, 53, 0.4)'
-                    }}
+                {/* Botón de compartir */}
+                <button
+                    onClick={() => onShare(displayName, item)}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-600/20 to-amber-500/20 border border-amber-500/30 rounded-full text-amber-200 hover:from-amber-500/30 hover:to-amber-400/30 hover:border-amber-400/50 hover:text-amber-100 transition-all duration-300 group"
                 >
-                    📱 COMPARTIR EN WHATSAPP
-                </div>
+                    <svg className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                    </svg>
+                    Compartir
+                </button>
             </div>
 
             {/* Las cinco ventanas - SIEMPRE 5 */}
