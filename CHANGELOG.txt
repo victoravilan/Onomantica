@@ -1,0 +1,3 @@
+Cambios aplicados:
+1) Añadido 'pointer-events-none' a la capa decorativa absoluta con blur.
+2) Añadido type="button" al botón 'Compartir'.
