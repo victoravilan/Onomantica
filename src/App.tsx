@@ -460,7 +460,6 @@ function App() {
             <Footer />
         </main>
         
-        {/* Modal simple de compartir */}
         {shareModalOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
                 <div className="bg-slate-800 rounded-2xl border border-amber-900/30 shadow-2xl max-w-md w-full p-6">
