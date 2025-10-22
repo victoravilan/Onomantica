@@ -296,7 +296,7 @@ const NameResults = ({ item, name, onShare }: {
                     <h2 className="font-serif text-5xl sm:text-6xl font-bold bg-gradient-to-r from-amber-200 via-amber-300 to-amber-200 bg-clip-text text-transparent mb-4 tracking-wide">
                         {displayName}
                     </h2>
-                    <div className="absolute -inset-2 bg-gradient-to-r from-amber-400/10 via-amber-300/20 to-amber-400/10 blur-xl rounded-lg opacity-50"></div>
+                    <div className="absolute -inset-2 bg-gradient-to-r from-amber-400/10 via-amber-300/20 to-amber-400/10 blur-xl rounded-lg opacity-50 pointer-events-none"></div>
                 </div>
                 <div className="flex items-center justify-center gap-3 text-slate-400 text-lg mb-6">
                     <span className="px-3 py-1 bg-slate-800/50 rounded-full border border-amber-900/30">{origin}</span>
@@ -305,7 +305,7 @@ const NameResults = ({ item, name, onShare }: {
                 </div>
                 
                 {/* Botón de compartir */}
-                <button
+                <button type="button"
                     onClick={() => onShare(displayName, item)}
                     className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-600/20 to-amber-500/20 border border-amber-500/30 rounded-full text-amber-200 hover:from-amber-500/30 hover:to-amber-400/30 hover:border-amber-400/50 hover:text-amber-100 transition-all duration-300 group"
                 >
