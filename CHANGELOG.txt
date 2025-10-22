@@ -1,3 +1,7 @@
-Cambios aplicados:
-1) Añadido 'pointer-events-none' a la capa decorativa absoluta con blur.
-2) Añadido type="button" al botón 'Compartir'.
+# CHANGELOG
+
+## Fix botón Compartir (App.tsx)
+- Añadido `pointer-events-none` a la capa decorativa absoluta para no interceptar clics.
+- Declarado `type="button"` en el botón “Compartir”.
+- Bloque del modal de compartir incluido **dentro** del `return` de React, antes del cierre `);`.
+- Web Share API con fallback a modal propio (WhatsApp, Facebook, Correo, Copiar, Descargar .txt).
